@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AntonProds — Portfolio</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'sans-serif'] },
+          colors: {
+            apple: {
+              dark: '#1d1d1f',
+              gray: '#86868b',
+              light: '#f5f5f7',
+              blue: '#0f2440',
+              blueHover: '#1a3558',
+            }
+          },
+          animation: {
+            'fade-up': 'fadeUp 1s ease-out forwards',
+            'fade-in': 'fadeIn 1.2s ease-out forwards',
+            'scale-in': 'scaleIn 0.8s ease-out forwards',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    * { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+
+    @keyframes fadeUp {
+      0% { opacity: 0; transform: translateY(40px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+    @keyframes scaleIn {
+      0% { opacity: 0; transform: scale(0.92); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.9s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                  transform 0.9s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    .reveal.active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+    .reveal-delay-4 { transition-delay: 0.4s; }
+
+    .nav-blur {
+      backdrop-filter: saturate(180%) blur(20px);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
+    }
+
+    .project-card {
+      transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                  box-shadow 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    .project-card:hover {
+      transform: scale(1.02);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.12);
+    }
+    .project-card:hover .project-img {
+      transform: scale(1.05);
+    }
+    .project-img {
+      transition: transform 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    .link-arrow {
+      transition: transform 0.3s ease, color 0.3s ease;
+    }
+    .link-arrow:hover .arrow-icon {
+      transform: translateX(4px);
+    }
+
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #f5f5f7; }
+    ::-webkit-scrollbar-thumb { background: #c7c7cc; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #8e8e93; }
+
+    .gradient-text {
+      background: linear-gradient(135deg, #0f2440 0%, #3d5a80 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-gradient {
+      background: radial-gradient(ellipse 80% 60% at 50% 40%, rgba(15,36,64,0.07) 0%, transparent 70%);
+    }
+
+    .modal-overlay {
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                  visibility 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    .modal-overlay.open {
+      opacity: 1;
+      visibility: visible;
+    }
+    .modal-panel {
+      transform: translateY(60px) scale(0.97);
+      opacity: 0;
+      transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                  opacity 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    .modal-overlay.open .modal-panel {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+    }
+    .modal-gallery-img {
+      transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    .modal-gallery-img:hover {
+      transform: scale(1.03);
+    }
+    body.modal-open {
+      overflow: hidden;
+    }
+
+    /* Mejora para móvil: botones táctiles */
+    @media (max-width: 640px) {
+      .btn-touch {
+        min-height: 44px;
+        min-width: 44px;
+      }
+    }
+
+    /* Transición suave del menú móvil */
+    #mobileMenu {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.3s ease;
+      opacity: 0;
+    }
+    #mobileMenu.open {
+      max-height: 400px;
+      opacity: 1;
+    }
+  </style>
+</head>
+
+<body class="font-sans bg-white text-apple-dark overflow-x-hidden">
+
+  <!-- ==================== NAVBAR ==================== -->
+  <nav id="navbar" class="fixed top-0 left-0 right-0 z-50 nav-blur bg-white/80 border-b border-black/5 transition-all duration-300">
+    <div class="max-w-[980px] mx-auto px-4 sm:px-6 flex items-center justify-between h-11 sm:h-12">
+      <a href="#hero" class="flex items-center gap-2 group">
+        <img src="https://z-cdn-media.chatglm.cn/files/418b1ade-e020-4742-a372-4dbd996e4d67.png?auth_key=1882892359-c85133b5c54246c5b5e5e846725a96cc-0-dfb3b7df766ec6ecadfe22a647a94e30" alt="AntonProds Logo" class="h-6 sm:h-7 w-auto object-contain">
+        <span class="text-xs sm:text-sm font-semibold tracking-tight text-apple-dark group-hover:text-apple-blue transition-colors duration-300">AntonProds</span>
+      </a>
+      <div class="hidden md:flex items-center gap-6 lg:gap-8">
+        <a href="#proyectos" class="text-xs font-normal text-apple-gray hover:text-apple-dark transition-colors duration-300">Proyectos</a>
+        <a href="#sobre-mi" class="text-xs font-normal text-apple-gray hover:text-apple-dark transition-colors duration-300">Sobre mí</a>
+        <a href="#servicios" class="text-xs font-normal text-apple-gray hover:text-apple-dark transition-colors duration-300">Servicios</a>
+        <a href="#contacto" class="text-xs font-normal text-apple-gray hover:text-apple-dark transition-colors duration-300">Contacto</a>
+      </div>
+      <button id="menuBtn" class="md:hidden p-1.5 text-apple-dark btn-touch" aria-label="Menú">
+        <iconify-icon icon="lucide:menu" width="22" height="22"></iconify-icon>
+      </button>
+    </div>
+    <div id="mobileMenu" class="md:hidden bg-white/95 nav-blur border-t border-black/5">
+      <div class="max-w-[980px] mx-auto px-4 sm:px-6 py-3 sm:py-4 flex flex-col gap-3 sm:gap-4">
+        <a href="#proyectos" class="text-sm text-apple-gray hover:text-apple-dark transition-colors mobile-link py-1">Proyectos</a>
+        <a href="#sobre-mi" class="text-sm text-apple-gray hover:text-apple-dark transition-colors mobile-link py-1">Sobre mí</a>
+        <a href="#servicios" class="text-sm text-apple-gray hover:text-apple-dark transition-colors mobile-link py-1">Servicios</a>
+        <a href="#contacto" class="text-sm text-apple-gray hover:text-apple-dark transition-colors mobile-link py-1">Contacto</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ==================== HERO ==================== -->
+  <section id="hero" class="hero-gradient min-h-screen flex flex-col items-center justify-center pt-12 pb-16 sm:pb-20 px-4 sm:px-6">
+    <div class="max-w-[980px] w-full text-center">
+      <p class="text-apple-blue text-xs sm:text-sm font-medium tracking-wide mb-3 sm:mb-4 animate-fade-in" style="animation-delay: 0.2s; opacity: 0;">Diseñador & Desarrollador</p>
+      <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.08] gradient-text animate-fade-up" style="animation-delay: 0.4s; opacity: 0;">Creo experiencias<br class="hidden sm:block">digitales únicas.</h1>
+      <p class="mt-4 sm:mt-6 text-base sm:text-lg md:text-xl font-light text-apple-gray max-w-xl mx-auto leading-relaxed animate-fade-up" style="animation-delay: 0.7s; opacity: 0;">Diseño y desarrollo sitios web, apps y marcas visuales que conectan con las personas.</p>
+      <div class="mt-8 sm:mt-10 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 animate-fade-up" style="animation-delay: 1s; opacity: 0;">
+        <a href="#proyectos" class="bg-apple-blue hover:bg-apple-blueHover text-white text-sm font-medium px-6 sm:px-8 py-2.5 sm:py-3 rounded-full transition-all duration-300 hover:scale-105 min-h-[44px] flex items-center">Ver proyectos</a>
+        <a href="#contacto" class="text-apple-blue text-sm font-medium px-6 sm:px-8 py-2.5 sm:py-3 rounded-full border border-apple-blue/25 hover:bg-apple-blue/5 transition-all duration-300 min-h-[44px] flex items-center">Hablemos</a>
+      </div>
+      <div class="mt-16 sm:mt-20 animate-fade-in" style="animation-delay: 1.5s; opacity: 0;">
+        <iconify-icon icon="lucide:chevron-down" width="20" height="20" class="text-apple-gray/50 animate-bounce"></iconify-icon>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== PROYECTOS ==================== -->
+  <section id="proyectos" class="py-16 sm:py-20 md:py-24 lg:py-32 px-4 sm:px-6 bg-apple-light">
+    <div class="max-w-[980px] mx-auto">
+      <div class="text-center mb-10 sm:mb-12 md:mb-16">
+        <p class="text-apple-blue text-xs font-semibold tracking-widest uppercase mb-3 reveal">Portafolio</p>
+        <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight reveal reveal-delay-1">Proyectos seleccionados</h2>
+        <p class="mt-3 sm:mt-4 text-apple-gray text-base sm:text-lg font-light reveal reveal-delay-2">Una selección de trabajos recientes en diseño y desarrollo.</p>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+
+        <!-- Project 1 -->
+        <div class="md:col-span-2 project-card bg-white rounded-2xl overflow-hidden cursor-pointer reveal" onclick="openModal('modal1')">
+          <div class="grid grid-cols-1 md:grid-cols-2">
+            <div class="overflow-hidden aspect-[4/3] md:aspect-auto">
+              <img src="https://picsum.photos/seed/apple-project-1/800/600.jpg" alt="E-commerce Premium" class="project-img w-full h-full object-cover">
+            </div>
+            <div class="p-6 sm:p-8 md:p-10 lg:p-12 flex flex-col justify-center">
+              <span class="text-xs font-medium text-apple-blue tracking-wider uppercase mb-2 sm:mb-3">Diseño Web</span>
+              <h3 class="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight mb-2 sm:mb-3">E-commerce Premium</h3>
+              <p class="text-apple-gray font-light leading-relaxed text-sm sm:text-base mb-4 sm:mb-6">Diseño y desarrollo de tienda online para una marca de moda sostenible con foco en experiencia de usuario y conversiones.</p>
+              <div class="flex items-center gap-2 text-apple-blue text-sm font-medium link-arrow">
+                Ver caso de estudio
+                <iconify-icon icon="lucide:arrow-right" width="16" height="16" class="arrow-icon transition-transform duration-300"></iconify-icon>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Project 2 -->
+        <div class="project-card bg-white rounded-2xl overflow-hidden cursor-pointer reveal reveal-delay-1" onclick="openModal('modal2')">
+          <div class="overflow-hidden aspect-[4/3]">
+            <img src="https://z-cdn-media.chatglm.cn/files/77f17c2c-fc37-40a9-93ac-3958a7be5202.jpg?auth_key=1882892802-944c1d2440be4767b227a2c240d01462-0-03207cd9dd3974c992ca4b207b212741" alt="Fernando Anton R Jordan Roja" class="project-img w-full h-full object-cover">
+          </div>
+          <div class="p-6 sm:p-8">
+            <span class="text-xs font-medium text-apple-blue tracking-wider uppercase mb-2 block">Producto</span>
+            <h3 class="text-lg sm:text-xl font-bold tracking-tight mb-2">Fernando Anton R — Jordan Roja</h3>
+            <p class="text-apple-gray text-sm font-light leading-relaxed mb-4">Diseño y producción de contenido visual para lanzamiento exclusivo de edición limitada.</p>
+            <div class="flex items-center gap-2 text-apple-blue text-sm font-medium link-arrow">
+              Ver detalle
+              <iconify-icon icon="lucide:arrow-right" width="14" height="14" class="arrow-icon transition-transform duration-300"></iconify-icon>
+            </div>
+          </div>
+        </div>
+
+        <!-- Project 3 - TOUS MANIFESTO -->
+        <div class="project-card bg-white rounded-2xl overflow-hidden cursor-pointer reveal reveal-delay-2" onclick="openModal('modal3')">
+          <div class="overflow-hidden aspect-[4/3]">
+            <img src="https://z-cdn-media.chatglm.cn/files/4fa24af6-400b-4268-bc5d-4748872130c0.jpg?auth_key=1882894414-b26f5556431f4b78b6d33bd868296ef3-0-33184fbcd8eb94ccaed15b6ce024a72f" alt="TOUS MANIFESTO" class="project-img w-full h-full object-cover">
+          </div>
+          <div class="p-6 sm:p-8">
+            <span class="text-xs font-medium text-apple-blue tracking-wider uppercase mb-2 block">Identidad de Marca</span>
+            <h3 class="text-lg sm:text-xl font-bold tracking-tight mb-2">TOUS MANIFESTO</h3>
+            <p class="text-apple-gray text-sm font-light leading-relaxed mb-4">Diseño de espacio expositivo y dirección visual para la campaña MANIFESTO de TOUS Joyería.</p>
+            <div class="flex items-center gap-2 text-apple-blue text-sm font-medium link-arrow">
+              Ver detalle
+              <iconify-icon icon="lucide:arrow-right" width="14" height="14" class="arrow-icon transition-transform duration-300"></iconify-icon>
+            </div>
+          </div>
+        </div>
+
+        <!-- Project 4 -->
+        <div class="project-card bg-white rounded-2xl overflow-hidden cursor-pointer reveal reveal-delay-1" onclick="openModal('modal4')">
+          <div class="overflow-hidden aspect-[4/3]">
+            <img src="https://picsum.photos/seed/apple-project-4/600/450.jpg" alt="Panel de Analytics" class="project-img w-full h-full object-cover">
+          </div>
+          <div class="p-6 sm:p-8">
+            <span class="text-xs font-medium text-apple-blue tracking-wider uppercase mb-2 block">Dashboard</span>
+            <h3 class="text-lg sm:text-xl font-bold tracking-tight mb-2">Panel de Analytics</h3>
+            <p class="text-apple-gray text-sm font-light leading-relaxed mb-4">Diseño de dashboard para visualización de datos en tiempo real para empresa SaaS.</p>
+            <div class="flex items-center gap-2 text-apple-blue text-sm font-medium link-arrow">
+              Ver detalle
+              <iconify-icon icon="lucide:arrow-right" width="14" height="14" class="arrow-icon transition-transform duration-300"></iconify-icon>
+            </div>
+          </div>
+        </div>
+
+        <!-- Project 5 -->
+        <div class="project-card bg-white rounded-2xl overflow-hidden cursor-pointer reveal reveal-delay-2" onclick="openModal('modal5')">
+          <div class="overflow-hidden aspect-[4/3]">
+            <img src="https://picsum.photos/seed/apple-project-5/600/450.jpg" alt="Campaña de Lanzamiento" class="project-img w-full h-full object-cover">
+          </div>
+          <div class="p-6 sm:p-8">
+            <span class="text-xs font-medium text-apple-blue tracking-wider uppercase mb-2 block">Landing Page</span>
+            <h3 class="text-lg sm:text-xl font-bold tracking-tight mb-2">Campaña de Lanzamiento</h3>
+            <p class="text-apple-gray text-sm font-light leading-relaxed mb-4">Landing page de alto impacto para lanzamiento de producto con animaciones interactivas.</p>
+            <div class="flex items-center gap-2 text-apple-blue text-sm font-medium link-arrow">
+              Ver detalle
+              <iconify-icon icon="lucide:arrow-right" width="14" height="14" class="arrow-icon transition-transform duration-300"></iconify-icon>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== SOBRE MÍ ==================== -->
+  <section id="sobre-mi" class="py-16 sm:py-20 md:py-24 lg:py-32 px-4 sm:px-6 bg-white">
+    <div class="max-w-[980px] mx-auto">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-12 md:gap-16 lg:gap-20 items-center">
+        <div class="reveal">
+          <div class="aspect-[4/5] rounded-2xl overflow-hidden">
+            <img src="https://picsum.photos/seed/apple-portrait/600/750.jpg" alt="Tu foto" class="w-full h-full object-cover">
+          </div>
+        </div>
+        <div>
+          <p class="text-apple-blue text-xs font-semibold tracking-widest uppercase mb-3 reveal">Sobre mí</p>
+          <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight mb-4 sm:mb-6 reveal reveal-delay-1">Diseño con propósito.</h2>
+          <p class="text-apple-gray font-light leading-relaxed text-base sm:text-lg mb-4 sm:mb-6 reveal reveal-delay-2">Soy un diseñador y desarrollador con más de 5 años de experiencia creando productos digitales. Me apasiona transformar ideas complejas en interfaces simples y elegantes.</p>
+          <p class="text-apple-gray font-light leading-relaxed text-base sm:text-lg mb-6 sm:mb-8 reveal reveal-delay-3">He trabajado con startups, agencias y grandes empresas, siempre con el mismo objetivo: crear experiencias que las personas disfruten usar.</p>
+          <div class="grid grid-cols-3 gap-4 sm:gap-6 reveal reveal-delay-4">
+            <div>
+              <p class="text-2xl sm:text-3xl md:text-4xl font-bold text-apple-dark">50+</p>
+              <p class="text-xs text-apple-gray mt-1">Proyectos</p>
+            </div>
+            <div>
+              <p class="text-2xl sm:text-3xl md:text-4xl font-bold text-apple-dark">5</p>
+              <p class="text-xs text-apple-gray mt-1">Años exp.</p>
+            </div>
+            <div>
+              <p class="text-2xl sm:text-3xl md:text-4xl font-bold text-apple-dark">30+</p>
+              <p class="text-xs text-apple-gray mt-1">Clientes</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== SERVICIOS ==================== -->
+  <section id="servicios" class="py-16 sm:py-20 md:py-24 lg:py-32 px-4 sm:px-6 bg-apple-dark text-white">
+    <div class="max-w-[980px] mx-auto">
+      <div class="text-center mb-10 sm:mb-12 md:mb-16">
+        <p class="text-apple-blue text-xs font-semibold tracking-widest uppercase mb-3 reveal">Servicios</p>
+        <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight reveal reveal-delay-1">Lo que hago</h2>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6">
+        <div class="bg-white/5 border border-white/10 rounded-2xl p-6 sm:p-7 md:p-8 hover:bg-white/10 transition-all duration-500 reveal">
+          <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-apple-blue/20 flex items-center justify-center mb-4 sm:mb-6">
+            <iconify-icon icon="lucide:palette" width="22" height="22" class="text-apple-blue"></iconify-icon>
+          </div>
+          <h3 class="text-base sm:text-lg font-semibold mb-2 sm:mb-3">Diseño UI/UX</h3>
+          <p class="text-white/50 font-light text-sm leading-relaxed">Interfaces intuitivas centradas en el usuario con investigación, wireframes y prototipos de alta fidelidad.</p>
+        </div>
+        <div class="bg-white/5 border border-white/10 rounded-2xl p-6 sm:p-7 md:p-8 hover:bg-white/10 transition-all duration-500 reveal reveal-delay-1">
+          <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-apple-blue/20 flex items-center justify-center mb-4 sm:mb-6">
+            <iconify-icon icon="lucide:code-2" width="22" height="22" class="text-apple-blue"></iconify-icon>
+          </div>
+          <h3 class="text-base sm:text-lg font-semibold mb-2 sm:mb-3">Desarrollo Web</h3>
+          <p class="text-white/50 font-light text-sm leading-relaxed">Sitios web rápidos, responsivos y optimizados con las tecnologías más modernas del mercado.</p>
+        </div>
+        <div class="bg-white/5 border border-white/10 rounded-2xl p-6 sm:p-7 md:p-8 hover:bg-white/10 transition-all duration-500 reveal reveal-delay-2">
+          <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-apple-blue/20 flex items-center justify-center mb-4 sm:mb-6">
+            <iconify-icon icon="lucide:smartphone" width="22" height="22" class="text-apple-blue"></iconify-icon>
+          </div>
+          <h3 class="text-base sm:text-lg font-semibold mb-2 sm:mb-3">Apps Móviles</h3>
+          <p class="text-white/50 font-light text-sm leading-relaxed">Aplicaciones nativas y multiplataforma con diseño fluido y rendimiento excepcional.</p>
+        </div>
+        <div class="bg-white/5 border border-white/10 rounded-2xl p-6 sm:p-7 md:p-8 hover:bg-white/10 transition-all duration-500 reveal">
+          <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-apple-blue/20 flex items-center justify-center mb-4 sm:mb-6">
+            <iconify-icon icon="lucide:pen-tool" width="22" height="22" class="text-apple-blue"></iconify-icon>
+          </div>
+          <h3 class="text-base sm:text-lg font-semibold mb-2 sm:mb-3">Branding</h3>
+          <p class="text-white/50 font-light text-sm leading-relaxed">Identidad visual completa: logotipo, paleta de colores, tipografía y manual de marca.</p>
+        </div>
+        <div class="bg-white/5 border border-white/10 rounded-2xl p-6 sm:p-7 md:p-8 hover:bg-white/10 transition-all duration-500 reveal reveal-delay-1">
+          <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-apple-blue/20 flex items-center justify-center mb-4 sm:mb-6">
+            <iconify-icon icon="lucide:bar-chart-3" width="22" height="22" class="text-apple-blue"></iconify-icon>
+          </div>
+          <h3 class="text-base sm:text-lg font-semibold mb-2 sm:mb-3">Dashboards</h3>
+          <p class="text-white/50 font-light text-sm leading-relaxed">Paneles de control para visualización de datos complejos de forma clara y accesible.</p>
+        </div>
+        <div class="bg-white/5 border border-white/10 rounded-2xl p-6 sm:p-7 md:p-8 hover:bg-white/10 transition-all duration-500 reveal reveal-delay-2">
+          <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-apple-blue/20 flex items-center justify-center mb-4 sm:mb-6">
+            <iconify-icon icon="lucide:rocket" width="22" height="22" class="text-apple-blue"></iconify-icon>
+          </div>
+          <h3 class="text-base sm:text-lg font-semibold mb-2 sm:mb-3">Consultoría</h3>
+          <p class="text-white/50 font-light text-sm leading-relaxed">Asesoría en estrategia digital, diseño de producto y optimización de experiencia de usuario.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== HERRAMIENTAS ==================== -->
+  <section class="py-14 sm:py-16 md:py-20 px-4 sm:px-6 bg-white border-t border-black/5">
+    <div class="max-w-[980px] mx-auto text-center">
+      <p class="text-apple-gray text-xs font-semibold tracking-widest uppercase mb-8 sm:mb-10 reveal">Herramientas que uso</p>
+      <div class="flex flex-wrap items-center justify-center gap-x-8 sm:gap-x-10 md:gap-x-12 gap-y-4 sm:gap-y-6 reveal reveal-delay-1">
+        <span class="text-apple-gray/40 text-xs sm:text-sm font-medium hover:text-apple-dark transition-colors duration-300 cursor-default">Figma</span>
+        <span class="text-apple-gray/40 text-xs sm:text-sm font-medium hover:text-apple-dark transition-colors duration-300 cursor-default">React</span>
+        <span class="text-apple-gray/40 text-xs sm:text-sm font-medium hover:text-apple-dark transition-colors duration-300 cursor-default">Next.js</span>
+        <span class="text-apple-gray/40 text-xs sm:text-sm font-medium hover:text-apple-dark transition-colors duration-300 cursor-default">Tailwind CSS</span>
+        <span class="text-apple-gray/40 text-xs sm:text-sm font-medium hover:text-apple-dark transition-colors duration-300 cursor-default">TypeScript</span>
+        <span class="text-apple-gray/40 text-xs sm:text-sm font-medium hover:text-apple-dark transition-colors duration-300 cursor-default">Node.js</span>
+        <span class="text-apple-gray/40 text-xs sm:text-sm font-medium hover:text-apple-dark transition-colors duration-300 cursor-default">Framer Motion</span>
+        <span class="text-apple-gray/40 text-xs sm:text-sm font-medium hover:text-apple-dark transition-colors duration-300 cursor-default">Adobe CC</span>
+        <span class="text-apple-gray/40 text-xs sm:text-sm font-medium hover:text-apple-dark transition-colors duration-300 cursor-default">GitHub</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== CONTACTO ==================== -->
+  <section id="contacto" class="py-16 sm:py-20 md:py-24 lg:py-32 px-4 sm:px-6 bg-apple-light">
+    <div class="max-w-[680px] mx-auto text-center">
+      <p class="text-apple-blue text-xs font-semibold tracking-widest uppercase mb-3 reveal">Contacto</p>
+      <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight mb-3 sm:mb-4 reveal reveal-delay-1">Hablemos de tu proyecto.</h2>
+      <p class="text-apple-gray text-base sm:text-lg font-light mb-8 sm:mb-10 md:mb-12 reveal reveal-delay-2">¿Tienes una idea? Me encantaría escucharla. Escríbeme y respondo en menos de 24 horas.</p>
+      <form id="contactForm" class="text-left space-y-4 sm:space-y-5 reveal reveal-delay-3">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+          <div>
+            <label for="name" class="block text-xs font-medium text-apple-gray mb-1.5 sm:mb-2">Nombre</label>
+            <input type="text" id="name" name="name" required placeholder="Tu nombre" class="w-full px-4 py-3.5 sm:py-3 bg-white border border-black/10 rounded-xl text-sm placeholder:text-apple-gray/40 focus:outline-none focus:ring-2 focus:ring-apple-blue/30 focus:border-apple-blue transition-all duration-300 min-h-[44px]">
+          </div>
+          <div>
+            <label for="email" class="block text-xs font-medium text-apple-gray mb-1.5 sm:mb-2">Email</label>
+            <input type="email" id="email" name="email" required placeholder="tu@email.com" class="w-full px-4 py-3.5 sm:py-3 bg-white border border-black/10 rounded-xl text-sm placeholder:text-apple-gray/40 focus:outline-none focus:ring-2 focus:ring-apple-blue/30 focus:border-apple-blue transition-all duration-300 min-h-[44px]">
+          </div>
+        </div>
+        <div>
+          <label for="subject" class="block text-xs font-medium text-apple-gray mb-1.5 sm:mb-2">Asunto</label>
+          <input type="text" id="subject" name="subject" placeholder="¿De qué quieres hablar?" class="w-full px-4 py-3.5 sm:py-3 bg-white border border-black/10 rounded-xl text-sm placeholder:text-apple-gray/40 focus:outline-none focus:ring-2 focus:ring-apple-blue/30 focus:border-apple-blue transition-all duration-300 min-h-[44px]">
+        </div>
+        <div>
+          <label for="message" class="block text-xs font-medium text-apple-gray mb-1.5 sm:mb-2">Mensaje</label>
+          <textarea id="message" name="message" rows="5" required placeholder="Cuéntame los detalles de tu proyecto..." class="w-full px-4 py-3.5 sm:py-3 bg-white border border-black/10 rounded-xl text-sm placeholder:text-apple-gray/40 focus:outline-none focus:ring-2 focus:ring-apple-blue/30 focus:border-apple-blue transition-all duration-300 resize-none min-h-[120px]"></textarea>
+        </div>
+        <div class="text-center pt-2 sm:pt-3">
+          <button type="submit" class="bg-apple-blue hover:bg-apple-blueHover text-white text-sm font-medium px-8 sm:px-10 py-3 sm:py-3.5 rounded-full transition-all duration-300 hover:scale-105 inline-flex items-center gap-2 min-h-[44px]">
+            Enviar mensaje
+            <iconify-icon icon="lucide:send" width="15" height="15"></iconify-icon>
+          </button>
+        </div>
+      </form>
+      <div id="successMsg" class="hidden mt-8 p-6 bg-green-50 border border-green-200 rounded-2xl text-center">
+        <iconify-icon icon="lucide:check-circle" width="32" height="32" class="text-green-500 mb-2"></iconify-icon>
+        <p class="text-green-800 font-medium">¡Mensaje enviado!</p>
+        <p class="text-green-600 text-sm mt-1">Te responderé lo antes posible.</p>
+      </div>
+      <div class="mt-12 sm:mt-16 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8 reveal reveal-delay-4">
+        <a href="mailto:hola@tunombre.com" class="flex items-center gap-2 text-apple-gray hover:text-apple-dark transition-colors duration-300 text-sm min-h-[44px]">
+          <iconify-icon icon="lucide:mail" width="16" height="16"></iconify-icon>
+          hola@tunombre.com
+        </a>
+        <a href="tel:+34123456789" class="flex items-center gap-2 text-apple-gray hover:text-apple-dark transition-colors duration-300 text-sm min-h-[44px]">
+          <iconify-icon icon="lucide:phone" width="16" height="16"></iconify-icon>
+          +34 123 456 789
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== FOOTER ==================== -->
+  <footer class="bg-apple-dark text-white/40 py-6 sm:py-8 px-4 sm:px-6">
+    <div class="max-w-[980px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
+      <p class="text-xs text-center sm:text-left">© 2025 AntonProds. Todos los derechos reservados.</p>
+      <div class="flex items-center gap-5 sm:gap-6">
+        <a href="#" class="hover:text-white transition-colors duration-300 min-h-[44px] flex items-center" aria-label="LinkedIn"><iconify-icon icon="lucide:linkedin" width="16" height="16"></iconify-icon></a>
+        <a href="#" class="hover:text-white transition-colors duration-300 min-h-[44px] flex items-center" aria-label="GitHub"><iconify-icon icon="lucide:github" width="16" height="16"></iconify-icon></a>
+        <a href="#" class="hover:text-white transition-colors duration-300 min-h-[44px] flex items-center" aria-label="Dribbble"><iconify-icon icon="lucide:dribbble" width="16" height="16"></iconify-icon></a>
+        <a href="#" class="hover:text-white transition-colors duration-300 min-h-[44px] flex items-center" aria-label="Twitter"><iconify-icon icon="lucide:twitter" width="16" height="16"></iconify-icon></a>
+      </div>
+    </div>
+  </footer>
+
+
+  <!-- ================================================================== -->
+  <!-- ==================== MODALES DE PROYECTO ========================== -->
+  <!-- ================================================================== -->
+
+  <!-- MODAL 1: E-commerce Premium -->
+  <div id="modal1" class="modal-overlay fixed inset-0 z-[100] bg-black/60 nav-blur flex items-start justify-center overflow-y-auto" onclick="closeModalOutside(event, 'modal1')">
+    <div class="modal-panel bg-white w-full max-w-[95%] sm:max-w-[90%] md:max-w-[860px] my-4 sm:my-8 md:my-16 mx-2 sm:mx-4 rounded-2xl overflow-hidden shadow-2xl">
+      <div class="relative aspect-[16/9] overflow-hidden">
+        <img src="https://picsum.photos/seed/ecom-hero/1200/675.jpg" alt="E-commerce" class="w-full h-full object-cover">
+        <button onclick="closeModal('modal1')" class="absolute top-3 sm:top-4 right-3 sm:right-4 w-9 h-9 sm:w-10 sm:h-10 bg-black/40 hover:bg-black/60 nav-blur rounded-full flex items-center justify-center text-white transition-colors duration-200">
+          <iconify-icon icon="lucide:x" width="16" height="16" class="sm:w-[18px] sm:h-[18px]"></iconify-icon>
+        </button>
+      </div>
+      <div class="p-5 sm:p-8 md:p-10 lg:p-12">
+        <span class="text-xs font-medium text-apple-blue tracking-wider uppercase">Diseño Web</span>
+        <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight mt-2 mb-3 sm:mb-4">E-commerce Premium</h2>
+        <p class="text-apple-gray font-light leading-relaxed text-sm sm:text-base md:text-lg mb-3 sm:mb-4">Tienda online para una marca de moda sostenible. El objetivo era crear una experiencia de compra inmersiva que reflejara los valores de la marca: minimalismo, calidad y responsabilidad ambiental.</p>
+        <p class="text-apple-gray font-light leading-relaxed text-sm sm:text-base mb-6 sm:mb-8">Trabajé desde la investigación de usuarios hasta la implementación final, pasando por wireframes, prototipos interactivos y diseño visual. El resultado fue un increase del 40% en conversiones respecto a la tienda anterior.</p>
+        <div class="flex flex-wrap gap-2 mb-6 sm:mb-8">
+          <span class="text-xs font-medium px-3 py-1.5 bg-apple-light rounded-full text-apple-gray">Figma</span>
+          <span class="text-xs font-medium px-3 py-1.5 bg-apple-light rounded-full text-apple-gray">Next.js</span>
+          <span class="text-xs font-medium px-3 py-1.5 bg-apple-light rounded-full text-apple-gray">Shopify</span>
+          <span class="text-xs font-medium px-3 py-1.5 bg-apple-light rounded-full text-apple-gray">Tailwind CSS</span>
+        </div>
+        <div class="grid grid-cols-2 gap-2 sm:gap-3">
+          <div class="aspect-[4/3] rounded-xl overflow-hidden"><img src="https://picsum.photos/seed/ecom-g1/600/450.jpg" alt="Detalle 1" class="modal-gallery-img w-full h-full object-cover cursor-pointer"></div>
+          <div class="aspect-[4/3] rounded-xl overflow-hidden"><img src="https://picsum.photos/seed/ecom-g2/600/450.jpg" alt="Detalle 2" class="modal-gallery-img w-full h-full object-cover cursor-pointer"></div>
+          <div class="aspect-[4/3] rounded-xl overflow-hidden"><img src="https://picsum.photos/seed/ecom-g3/600/450.jpg" alt="Detalle 3" class="modal-gallery-img w-full h-full object-cover cursor-pointer"></div>
+          <div class="aspect-[4/3] rounded-xl overflow-hidden"><img src="https://picsum.photos/seed/ecom-g4/600/450.jpg" alt="Detalle 4" class="modal-gallery-img w-full h-full object-cover cursor-pointer"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 2: Fernando Anton R — Jordan Roja -->
+  <div id="modal2" class="modal-overlay fixed inset-0 z-[100] bg-black/60 nav-blur flex items-start justify-center overflow-y-auto" onclick="closeModalOutside(event, 'modal2')">
+    <div class="modal-panel bg-white w-full max-w-[95%] sm:max-w-[90%] md:max-w-[860px] my-4 sm:my-8 md:my-16 mx-2 sm:mx-4 rounded-2xl overflow-hidden shadow-2xl">
+      <div class="relative aspect-[16/9] overflow-hidden bg-black">
+        <img src="https://z-cdn-media.chatglm.cn/files/77f17c2c-fc37-40a9-93ac-3958a7be5202.jpg?auth_key=1882892802-944c1d2440be4767b227a2c240d01462-0-03207cd9dd3974c992ca4b207b212741" alt="Jordan Roja" class="w-full h-full object-cover">
+        <button onclick="closeModal('modal2')" class="absolute top-3 sm:top-4 right-3 sm:right-4 w-9 h-9 sm:w-10 sm:h-10 bg-black/40 hover:bg-black/60 nav-blur rounded-full flex items-center justify-center text-white transition-colors duration-200">
+          <iconify-icon icon="lucide:x" width="16" height="16" class="sm:w-[18px] sm:h-[18px]"></iconify-icon>
+        </button>
+      </div>
+      <div class="p-5 sm:p-8 md:p-10 lg:p-12">
+        <span class="text-xs font-medium text-apple-blue tracking-wider uppercase">Producto</span>
+        <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight mt-2 mb-3 sm:mb-4">Fernando Anton R — Jordan Roja</h2>
+        <p class="text-apple-gray font-light leading-relaxed text-sm sm:text-base md:text-lg mb-3 sm:mb-4">Proyecto de producción visual y dirección creativa para el lanzamiento de la edición limitada "Fernando Anton R" en colaboración con Jordan Brand. Un concepto que fusiona la cultura streetwear con la elegancia del diseño español.</p>
+        <p class="text-apple-gray font-light leading-relaxed text-sm sm:text-base mb-3 sm:mb-4">La sesión fotográfica se centró en capturar la textura y los detalles del modelo sobre fondos oscuros que resaltan el rojo intenso como elemento principal. Cada imagen fue pensada para funcionar tanto en redes sociales como en soporte impreso.</p>
+        <p class="text-apple-gray font-light leading-relaxed text-sm sm:text-base mb-6 sm:mb-8">El contenido generado se utilizó en campañas digitales, packaging y materiales promocionales para la venta directa al consumidor.</p>
+        <div class="flex flex-wrap gap-2 mb-6 sm:mb-8">
+          <span class="text-xs font-medium px-3 py-1.5 bg-apple-light rounded-full text-apple-gray">Fotografía</span>
+          <span class="text-xs font-medium px-3 py-1.5 bg-apple-light rounded-full text-apple-gray">Dirección Creativa</span>
+          <span class="text-xs font-medium px-3 py-1.5 bg-apple-light rounded-full text-apple-gray">Adobe Lightroom</span>
+          <span class="text-xs font-medium px-3 py-1.5 bg-apple-light rounded-full text-apple-gray">Photoshop</span>
+        </div>
+        <div class="grid grid-cols-2 gap-2 sm:gap-3">
+          <div class="aspect-[4/3] rounded-xl overflow-hidden bg-black"><img src="https://z-cdn-media.chatglm.cn/files/77f17c2c-fc37-40a9-93ac-3958a7be5202.jpg?auth_key=1882892802-944c1d2440be4767b227a2c240d01462-0-03207cd9dd3974c992ca4b207b212741" alt="Jordan ángulo 2" class="modal-gallery-img w-full h-full object-cover cursor-pointer"></div>
+          <div class="aspect-[4/3] rounded-xl overflow-hidden bg-black"><img src="https://z-cdn-media.chatglm.cn/files/77f17c2c-fc37-40a9-93ac-3958a7be5202.jpg?auth_key=1882892802-944c1d2440be4767b227a2c240d01462-0-03207cd9dd3974c992ca4b207b212741" alt="Jordan detalle" class="modal-gallery-img w-full h-full object-cover cursor-pointer object-top"></div>
+          <div class="aspect-[4/3] rounded-xl overflow-hidden bg-black"><img src="https://z-cdn-media.chatglm.cn/files/77f17c2c-fc37-40a9-93ac-3958a7be5202.jpg?auth_key=1882892802-944c1d2440be4767b227a2c240d01462-0-03207cd9dd3974c992ca4b207b212741" alt="Jordan sole" class="modal-gallery-img w-full h-full object-cover cursor-pointer object-bottom"></div>
+          <div class="aspect-[4/3] rounded-xl overflow-hidden bg-black"><img src="https://z-cdn-media.chatglm.cn/files/77f17c2c-fc37-40a9-93ac-3958a7be5202.jpg?auth_key=1882892802-944c1d2440be4767b227a2c240d01462-0-03207cd9dd3974c992ca4b207b212741" alt="Jordan lateral" class="modal-gallery-img w-full h-full object-cover cursor-pointer object-center"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 3: TOUS MANIFESTO -->
+  <div id="modal3" class="modal-overlay fixed inset-0 z-[100] bg-black/60 nav-blur flex items-start justify-center overflow-y-auto" onclick="closeModalOutside(event, 'modal3')">
+    <div class="modal-panel bg-white w-full max-w-[95%] sm:max-w-[90%] md:max-w-[860px] my-4 sm:my-8 md:my-16 mx-2 sm:mx-4 rounded-2xl overflow-hidden shadow-2xl">
+      <div class="relative aspect-[16/9] overflow-hidden">
+        <img src="https://z-cdn-media.chatglm.cn/files/4fa24af6-400b-4268-bc5d-4748872130c0.jpg?auth_key=1882894414-b26f5556431f4b78b6d33bd868296ef3-0-33184fbcd8eb94ccaed15b6ce024a72f" alt="TOUS MANIFESTO" class="w-full h-full object-cover">
+        <button onclick="closeModal('modal3')" class="absolute top-3 sm:top-4 right-3 sm:right-4 w-9 h-9 sm:w-10 sm:h-10 bg-black/40 hover:bg-black/60 nav-blur rounded-full flex items-center justify-center text-white transition-colors duration-200">
+          <iconify-icon icon="lucide:x" width="16" height="16" class="sm:w-[18px] sm:h-[18px]"></iconify-icon>
+        </button>
+      </div>
+      <div class="p-5 sm:p-8 md:p-10 lg:p-12">
+        <span class="text-xs font-medium text-apple-blue tracking-wider uppercase">Identidad de Marca</span>
+        <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight mt-2 mb-3 sm:mb-4">TOUS MANIFESTO</h2>
+        <p class="text-apple-gray font-light leading-relaxed text-sm sm:text-base md:text-lg mb-3 sm:mb-4">Diseño de espacio expositivo y dirección visual para la campaña MANIFESTO de TOUS Joyería. El concepto se basó en crear un entorno inmersivo donde la pieza central fuera la joya, rodeada de una atmósfera de elegancia contemporánea.</p>
+        <p class="text-apple-gray font-light leading-relaxed text-sm sm:text-base mb-3 sm:mb-4">El espacio combina superficies curvas con una paleta de tonos rosados y púrpuras que evolucionan en gradiente, creando un escenario artístico que eleva la percepción de la colección. Los muebles expositores de líneas orgánicas guían al visitante a través de un recorrido sensorial.</p>
+        <p class="text-apple-gray font-light leading-relaxed text-sm sm:text-base mb-6 sm:mb-8">El proyecto abarcó desde el concepto creativo y la dirección de arte hasta la supervisión de la producción del espacio físico y la generación de contenido visual para redes sociales y prensa.</p>
+        <div class="flex flex-wrap gap-2 mb-6 sm:mb-8">
+          <span class="text-xs font-medium px-3 py-1.5 bg-apple-light rounded-full text-apple-gray">Dirección de Arte</span>
+          <span class="text-xs font-medium px-3 py-1.5 bg-apple-light rounded-full text-apple-gray">Diseño Espacial</span>
+          <span class="text-xs font-medium px-3 py-1.5 bg-apple-light rounded-full text-apple-gray">Fotografía</span>
+          <span class="text-xs font-medium px-3 py-1.5 bg-apple-light rounded-full text-apple-gray">Producción</span>
+        </div>
+        <div class="grid grid-cols-2 gap-2 sm:gap-3">
+          <div class="aspect-[4/3] rounded-xl overflow-hidden"><img src="https://z-cdn-media.chatglm.cn/files/4fa24af6-400b-4268-bc5d-4748872130c0.jpg?auth_key=1882894414-b26f5556431f4b78b6d33bd868296ef3-0-33184fbcd8eb94ccaed15b6ce024a72f" alt="TOUS全景" class="modal-gallery-img w-full h-full object-cover cursor-pointer"></div>
+          <div class="aspect-[4/3] rounded-xl overflow-hidden"><img src="https://z-cdn-media.chatglm.cn/files/4fa24af6-400b-4268-bc5d-4748872130c0.jpg?auth_key=1882894414-b26f5556431f4b78b6d33bd868296ef3-0-33184fbcd8eb94ccaed15b6ce024a72f" alt="TOUS expositores" class="modal-gallery-img w-full h-full object-cover cursor-pointer object-left"></div>
+          <div class="aspect-[4/3] rounded-xl overflow-hidden"><img src="https://z-cdn-media.chatglm.cn/files/4fa24af6-400b-4268-bc5d-4748872130c0.jpg?auth_key=1882894414-b26f5556431f4b78b6d33bd868296ef3-0-33184fbcd8eb94ccaed15b6ce024a72f" alt="TOUS detalle joyas" class="modal-gallery-img w-full h-full object-cover cursor-pointer object-bottom"></div>
+          <div class="aspect-[4/3] rounded-xl overflow-hidden"><img src="https://z-cdn-media.chatglm.cn/files/4fa24af6-400b-4268-bc5d-4748872130c0.jpg?auth_key=1882894414-b26f5556431f4b78b6d33bd868296ef3-0-33184fbcd8eb94ccaed15b6ce024a72f" alt="TOUS gradiente" class="modal-gallery-img w-full h-full object-cover cursor-pointer object-right"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 4: Panel de Analytics -->
+  <div id="modal4" class="modal-overlay fixed inset-0 z-[100] bg-black/60 nav-blur flex items-start justify-center overflow-y-auto" onclick="closeModalOutside(event, 'modal4')">
+    <div class="modal-panel bg-white w-full max-w-[95%] sm:max-w-[90%] md:max-w-[860px] my-4 sm:my-8 md:my-16 mx-2 sm:mx-4 rounded-2xl overflow-hidden shadow-2xl">
+      <div class="relative aspect-[16/9] overflow-hidden">
+        <img src="https://picsum.photos/seed/dash-hero/1200/675.jpg" alt="Dashboard" class="w-full h-full object-cover">
+        <button onclick="closeModal('modal4')" class="absolute top-3 sm:top-4 right-3 sm:right-4 w-9 h-9 sm:w-10 sm:h-10 bg-black/40 hover:bg-black/60 nav-blur rounded-full flex items-center justify-center text-white transition-colors duration-200">
+          <iconify-icon icon="lucide:x" width="16" height="16" class="sm:w-[18px] sm:h-[18px]"></iconify-icon>
+        </button>
+      </div>
+      <div class="p-5 sm:p-8 md:p-10 lg:p-12">
+        <span class="text-xs font-medium text-apple-blue tracking-wider uppercase">Dashboard</span>
+        <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight mt-2 mb-3 sm:mb-4">Panel de Analytics</h2>
+        <p class="text-apple-gray font-light leading-relaxed text-sm sm:text-base md:text-lg mb-3 sm:mb-4">Diseño de un dashboard de análisis de datos en tiempo real para MetricFlow, una plataforma SaaS B2B. El reto era presentar métricas complejas de forma que cualquier miembro del equipo pudiera entenderlas sin formación técnica.</p>
+        <p class="text-apple-gray font-light leading-relaxed text-sm sm:text-base mb-6 sm:mb-8">Se diseñaron más de 30 pantallas incluyendo vista general, reportes detallados, configuración de alertas y exportación de datos. Se implementó un sistema de temas claro/oscuro y una estructura modular que permite personalizar los widgets.</p>
+        <div class="flex flex-wrap gap-2 mb-6 sm:mb-8">
+          <span class="text-xs font-medium px-3 py-1.5 bg-apple-light rounded-full text-apple-gray">Figma</span>
+          <span class="text-xs font-medium px-3 py-1.5 bg-apple-light rounded-full text-apple-gray">React</span>
+          <span class="text-xs font-medium px-3 py-1.5 bg-apple-light rounded-full text-apple-gray">D3.js</span>
+          <span class="text-xs font-medium px-3 py-1.5 bg-apple-light rounded-full text-apple-gray">Tailwind CSS</span>
+        </div>
+        <div class="grid grid-cols-2 gap-2 sm:gap-3">
+          <div class="aspect-[4/3] rounded-xl overflow-hidden"><img src="https://picsum.photos/seed/dash-g1/600/450.jpg" alt="Vista general" class="modal-gallery-img w-full h-full object-cover cursor-pointer"></div>
+          <div class="aspect-[4/3] rounded-xl overflow-hidden"><img src="https://picsum.photos/seed/dash-g2/600/450.jpg" alt="Gráficos" class="modal-gallery-img w-full h-full object-cover cursor-pointer"></div>
+          <div class="aspect-[4/3] rounded-xl overflow-hidden"><img src="https://picsum.photos/seed/dash-g3/600/450.jpg" alt="Tema oscuro" class="modal-gallery-img w-full h-full object-cover cursor-pointer"></div>
+          <div class="aspect-[4/3] rounded-xl overflow-hidden"><img src="https://picsum.photos/seed/dash-g4/600/450.jpg" alt="Móvil" class="modal-gallery-img w-full h-full object-cover cursor-pointer"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 5: Campaña de Lanzamiento -->
+  <div id="modal5" class="modal-overlay fixed inset-0 z-[100] bg-black/60 nav-blur flex items-start justify-center overflow-y-auto" onclick="closeModalOutside(event, 'modal5')">
+    <div class="modal-panel bg-white w-full max-w-[95%] sm:max-w-[90%] md:max-w-[860px] my-4 sm:my-8 md:my-16 mx-2 sm:mx-4 rounded-2xl overflow-hidden shadow-2xl">
+      <div class="relative aspect-[16/9] overflow-hidden">
+        <img src="https://picsum.photos/seed/land-hero/1200/675.jpg" alt="Landing Page" class="w-full h-full object-cover">
+        <button onclick="closeModal('modal5')" class="absolute top-3 sm:top-4 right-3 sm:right-4 w-9 h-9 sm:w-10 sm:h-10 bg-black/40 hover:bg-black/60 nav-blur rounded-full flex items-center justify-center text-white transition-colors duration-200">
+          <iconify-icon icon="lucide:x" width="16" height="16" class="sm:w-[18px] sm:h-[18px]"></iconify-icon>
+        </button>
+      </div>
+      <div class="p-5 sm:p-8 md:p-10 lg:p-12">
+        <span class="text-xs font-medium text-apple-blue tracking-wider uppercase">Landing Page</span>
+        <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight mt-2 mb-3 sm:mb-4">Campaña de Lanzamiento</h2>
+        <p class="text-apple-gray font-light leading-relaxed text-sm sm:text-base md:text-lg mb-3 sm:mb-4">Landing page de alto impacto para el lanzamiento de Pulse, una app de productividad personal. El concepto visual se basó en ondas de sonido y movimiento fluido para transmitir la idea de "estar en flow".</p>
+        <p class="text-apple-gray font-light leading-relaxed text-sm sm:text-base mb-6 sm:mb-8">La página incluye animaciones al scroll con Framer Motion, un video hero a pantalla completa, sección de testimonials con carrusel y un formulario de early access que consiguió más de 5.000 registros en la primera semana.</p>
+        <div class="flex flex-wrap gap-2 mb-6 sm:mb-8">
+          <span class="text-xs font-medium px-3 py-1.5 bg-apple-light rounded-full text-apple-gray">Next.js</span>
+          <span class="text-xs font-medium px-3 py-1.5 bg-apple-light rounded-full text-apple-gray">Framer Motion</span>
+          <span class="text-xs font-medium px-3 py-1.5 bg-apple-light rounded-full text-apple-gray">GSAP</span>
+          <span class="text-xs font-medium px-3 py-1.5 bg-apple-light rounded-full text-apple-gray">Vercel</span>
+        </div>
+        <div class="grid grid-cols-2 gap-2 sm:gap-3">
+          <div class="aspect-[4/3] rounded-xl overflow-hidden"><img src="https://picsum.photos/seed/land-g1/600/450.jpg" alt="Hero animado" class="modal-gallery-img w-full h-full object-cover cursor-pointer"></div>
+          <div class="aspect-[4/3] rounded-xl overflow-hidden"><img src="https://picsum.photos/seed/land-g2/600/450.jpg" alt="Features" class="modal-gallery-img w-full h-full object-cover cursor-pointer"></div>
+          <div class="aspect-[4/3] rounded-xl overflow-hidden"><img src="https://picsum.photos/seed/land-g3/600/450.jpg" alt="Testimonials" class="modal-gallery-img w-full h-full object-cover cursor-pointer"></div>
+          <div class="aspect-[4/3] rounded-xl overflow-hidden"><img src="https://picsum.photos/seed/land-g4/600/450.jpg" alt="CTA" class="modal-gallery-img w-full h-full object-cover cursor-pointer"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ==================== SCRIPTS ==================== -->
+  <script>
+    // ---- Scroll Reveal ----
+    const revealElements = document.querySelectorAll('.reveal');
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) entry.target.classList.add('active');
+      });
+    }, { threshold: 0.05, rootMargin: '0px 0px -30px 0px' }); // threshold más bajo para móvil
+    revealElements.forEach(el => revealObserver.observe(el));
+
+    // ---- Mobile Menu ----
+    const menuBtn = document.getElementById('menuBtn');
+    const mobileMenu = document.getElementById('mobileMenu');
+    let menuOpen = false;
+    menuBtn.addEventListener('click', () => {
+      menuOpen = !menuOpen;
+      mobileMenu.classList.toggle('open');
+      menuBtn.innerHTML = menuOpen
+        ? '<iconify-icon icon="lucide:x" width="22" height="22"></iconify-icon>'
+        : '<iconify-icon icon="lucide:menu" width="22" height="22"></iconify-icon>';
+    });
+    // Cerrar menú al hacer clic en un enlace
+    document.querySelectorAll('.mobile-link').forEach(link => {
+      link.addEventListener('click', () => {
+        mobileMenu.classList.remove('open');
+        menuOpen = false;
+        menuBtn.innerHTML = '<iconify-icon icon="lucide:menu" width="22" height="22"></iconify-icon>';
+      });
+    });
+    // Cerrar menú al hacer scroll
+    let scrollTimeout;
+    window.addEventListener('scroll', () => {
+      if (menuOpen) {
+        clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(() => {
+          mobileMenu.classList.remove('open');
+          menuOpen = false;
+          menuBtn.innerHTML = '<iconify-icon icon="lucide:menu" width="22" height="22"></iconify-icon>';
+        }, 300);
+      }
+    });
+
+    // ---- Navbar shadow ----
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      navbar.classList.toggle('shadow-sm', window.scrollY > 10);
+    });
+
+    // ---- Contact Form ----
+    const contactForm = document.getElementById('contactForm');
+    const successMsg = document.getElementById('successMsg');
+    contactForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const btn = contactForm.querySelector('button[type="submit"]');
+      btn.disabled = true;
+      btn.innerHTML = '<iconify-icon icon="lucide:loader-2" width="16" height="16" class="animate-spin"></iconify-icon> Enviando...';
+      setTimeout(() => {
+        contactForm.style.display = 'none';
+        successMsg.classList.remove('hidden');
+      }, 1500);
+    });
+
+    // ---- MODAL SYSTEM ----
+    function openModal(id) {
+      const modal = document.getElementById(id);
+      modal.classList.add('open');
+      document.body.classList.add('modal-open');
+      document.body.style.paddingRight = getScrollbarWidth() + 'px';
+    }
+
+    function closeModal(id) {
+      const modal = document.getElementById(id);
+      modal.classList.remove('open');
+      document.body.classList.remove('modal-open');
+      document.body.style.paddingRight = '0px';
+    }
+
+    function closeModalOutside(event, id) {
+      if (event.target === event.currentTarget) {
+        closeModal(id);
+      }
+    }
+
+    function getScrollbarWidth() {
+      return window.innerWidth - document.documentElement.clientWidth;
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        document.querySelectorAll('.modal-overlay.open').forEach(modal => {
+          closeModal(modal.id);
+        });
+      }
+    });
+  </script>
+
+</body>
+</html>
