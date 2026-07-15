@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AntonProds — Portfolio</title>
+  <meta name="description" content="Diseño y desarrollo de experiencias digitales únicas." data-desc-en="Design and development of unique digital experiences.">
+  <link rel="icon" type="image/png" href="LOGO_TRAS_BLANCO.png">
+  <link rel="apple-touch-icon" href="LOGO_TRAS_BLANCO.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'apple-dark': '#1d1d1f',
+            'apple-gray': '#86868b',
+            'apple-light': '#f5f5f7',
+            'apple-blue': '#0f2440',
+            'apple-blueHover': '#1a3558',
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+          },
+        },
+      },
+    }
+  </script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: #fff; color: #1d1d1f; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+    img { display: block; max-width: 100%; }
+
+    /* Animations */
+    @keyframes fadeUp {
+      0% { opacity: 0; transform: translateY(40px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+    .animate-fade-up { animation: fadeUp 1s ease-out forwards; }
+    .animate-fade-in { animation: fadeIn 1.2s ease-out forwards; }
+
+    /* Scroll reveal */
+    .reveal {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.9s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                  transform 0.9s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    .reveal.active { opacity: 1; transform: translateY(0); }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+    .reveal-delay-4 { transition-delay: 0.4s; }
+
+    /* Nav blur */
+    .nav-blur {
+      backdrop-filter: saturate(180%) blur(20px);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
+    }
+
+    /* Project card hover */
+    .project-card {
+      transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                  box-shadow 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    .project-card:hover {
+      transform: scale(1.02);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.12);
+    }
+    .project-card:hover .project-img { transform: scale(1.05); }
+    .project-img {
+      transition: transform 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    /* Link arrow */
+    .link-arrow { transition: transform 0.3s ease, color 0.3s ease; }
+    .link-arrow:hover .arrow-icon { transform: translateX(4px); }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #f5f5f7; }
+    ::-webkit-scrollbar-thumb { background: #c7c7cc; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #8e8e93; }
+
+    /* Modal */
+    .modal-overlay {
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                  visibility 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    .modal-overlay.open { opacity: 1; visibility: visible; }
+    .modal-panel {
+      transform: translateY(60px) scale(0.97);
+      opacity: 0;
+      transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                  opacity 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    .modal-overlay.open .modal-panel { transform: translateY(0) scale(1); opacity: 1; }
+    .modal-gallery-img { transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
+    .modal-gallery-img:hover { transform: scale(1.03); }
+    body.modal-open { overflow: hidden; }
+
+    /* Lightbox */
+    .lightbox {
+      transition: opacity 0.3s ease;
+    }
+    .lightbox.active { opacity: 1; pointer-events: auto; }
+    .lightbox.inactive { opacity: 0; pointer-events: none; }
+
+    /* Mobile menu */
+    #mobileMenu {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.3s ease;
+      opacity: 0;
+    }
+    #mobileMenu.open { max-height: 400px; opacity: 1; }
+
+    /* Mobile touch targets */
+    @media (max-width: 640px) {
+      .btn-touch { min-height: 44px; min-width: 44px; }
+    }
+
+    /* Hero gradient */
+    .hero-gradient {
+      background: radial-gradient(ellipse 80% 60% at 50% 40%, rgba(15,36,64,0.07) 0%, transparent 70%);
+    }
+  </style>
+<style>*, ::before, ::after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/* ! tailwindcss v3.4.17 | MIT License | https://tailwindcss.com */*,::after,::before{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}::after,::before{--tw-content:''}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:Inter, system-ui, -apple-system, sans-serif;font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0;padding:0}legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.fixed{position:fixed}.absolute{position:absolute}.relative{position:relative}.inset-0{inset:0px}.left-0{left:0px}.right-0{right:0px}.top-0{top:0px}.right-3{right:0.75rem}.top-3{top:0.75rem}.right-4{right:1rem}.top-4{top:1rem}.z-50{z-index:50}.z-0{z-index:0}.z-10{z-index:10}.z-\[100\]{z-index:100}.z-\[200\]{z-index:200}.mx-auto{margin-left:auto;margin-right:auto}.mx-2{margin-left:0.5rem;margin-right:0.5rem}.my-4{margin-top:1rem;margin-bottom:1rem}.mb-10{margin-bottom:2.5rem}.mb-3{margin-bottom:0.75rem}.mt-3{margin-top:0.75rem}.mt-8{margin-top:2rem}.mb-1\.5{margin-bottom:0.375rem}.mb-2{margin-bottom:0.5rem}.mb-4{margin-bottom:1rem}.mb-6{margin-bottom:1.5rem}.mb-8{margin-bottom:2rem}.mt-1{margin-top:0.25rem}.mt-4{margin-top:1rem}.mt-12{margin-top:3rem}.mt-auto{margin-top:auto}.mt-2{margin-top:0.5rem}.block{display:block}.flex{display:flex}.inline-flex{display:inline-flex}.grid{display:grid}.hidden{display:none}.aspect-\[4\/3\]{aspect-ratio:4/3}.aspect-\[4\/5\]{aspect-ratio:4/5}.aspect-\[16\/9\]{aspect-ratio:16/9}.aspect-video{aspect-ratio:16 / 9}.h-11{height:2.75rem}.h-6{height:1.5rem}.h-full{height:100%}.h-9{height:2.25rem}.h-10{height:2.5rem}.max-h-\[88vh\]{max-height:88vh}.min-h-\[44px\]{min-height:44px}.min-h-screen{min-height:100vh}.min-h-\[120px\]{min-height:120px}.w-auto{width:auto}.w-full{width:100%}.w-9{width:2.25rem}.w-10{width:2.5rem}.max-w-\[980px\]{max-width:980px}.max-w-\[680px\]{max-width:680px}.max-w-\[95\%\]{max-width:95%}.max-w-\[92vw\]{max-width:92vw}.shrink-0{flex-shrink:0}.scale-105{--tw-scale-x:1.05;--tw-scale-y:1.05;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.cursor-pointer{cursor:pointer}.resize-none{resize:none}.grid-cols-1{grid-template-columns:repeat(1, minmax(0, 1fr))}.grid-cols-3{grid-template-columns:repeat(3, minmax(0, 1fr))}.grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}.flex-col{flex-direction:column}.flex-wrap{flex-wrap:wrap}.items-start{align-items:flex-start}.items-center{align-items:center}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.gap-2{gap:0.5rem}.gap-6{gap:1.5rem}.gap-1\.5{gap:0.375rem}.gap-3{gap:0.75rem}.gap-4{gap:1rem}.gap-8{gap:2rem}.gap-5{gap:1.25rem}.space-y-4 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1rem * var(--tw-space-y-reverse))}.overflow-hidden{overflow:hidden}.overflow-y-auto{overflow-y:auto}.overflow-x-hidden{overflow-x:hidden}.scroll-smooth{scroll-behavior:smooth}.rounded-2xl{border-radius:1rem}.rounded-full{border-radius:9999px}.rounded-xl{border-radius:0.75rem}.rounded-lg{border-radius:0.5rem}.border{border-width:1px}.border-b{border-bottom-width:1px}.border-t{border-top-width:1px}.border-black\/5{border-color:rgb(0 0 0 / 0.05)}.border-white\/30{border-color:rgb(255 255 255 / 0.3)}.border-black\/10{border-color:rgb(0 0 0 / 0.1)}.border-green-200{--tw-border-opacity:1;border-color:rgb(187 247 208 / var(--tw-border-opacity, 1))}.bg-white\/80{background-color:rgb(255 255 255 / 0.8)}.bg-apple-blue{--tw-bg-opacity:1;background-color:rgb(15 36 64 / var(--tw-bg-opacity, 1))}.bg-apple-light{--tw-bg-opacity:1;background-color:rgb(245 245 247 / var(--tw-bg-opacity, 1))}.bg-black\/40{background-color:rgb(0 0 0 / 0.4)}.bg-white{--tw-bg-opacity:1;background-color:rgb(255 255 255 / var(--tw-bg-opacity, 1))}.bg-white\/95{background-color:rgb(255 255 255 / 0.95)}.bg-black{--tw-bg-opacity:1;background-color:rgb(0 0 0 / var(--tw-bg-opacity, 1))}.bg-green-50{--tw-bg-opacity:1;background-color:rgb(240 253 244 / var(--tw-bg-opacity, 1))}.bg-apple-dark{--tw-bg-opacity:1;background-color:rgb(29 29 31 / var(--tw-bg-opacity, 1))}.bg-black\/60{background-color:rgb(0 0 0 / 0.6)}.bg-black\/90{background-color:rgb(0 0 0 / 0.9)}.bg-white\/10{background-color:rgb(255 255 255 / 0.1)}.object-contain{object-fit:contain}.object-cover{object-fit:cover}.p-1\.5{padding:0.375rem}.p-5{padding:1.25rem}.p-6{padding:1.5rem}.p-8{padding:2rem}.px-4{padding-left:1rem;padding-right:1rem}.px-7{padding-left:1.75rem;padding-right:1.75rem}.py-1{padding-top:0.25rem;padding-bottom:0.25rem}.py-16{padding-top:4rem;padding-bottom:4rem}.py-2\.5{padding-top:0.625rem;padding-bottom:0.625rem}.py-3{padding-top:0.75rem;padding-bottom:0.75rem}.px-8{padding-left:2rem;padding-right:2rem}.py-3\.5{padding-top:0.875rem;padding-bottom:0.875rem}.py-6{padding-top:1.5rem;padding-bottom:1.5rem}.px-3{padding-left:0.75rem;padding-right:0.75rem}.py-1\.5{padding-top:0.375rem;padding-bottom:0.375rem}.pb-16{padding-bottom:4rem}.pt-12{padding-top:3rem}.pt-2{padding-top:0.5rem}.text-left{text-align:left}.text-center{text-align:center}.text-xs{font-size:0.75rem;line-height:1rem}.text-3xl{font-size:1.875rem;line-height:2.25rem}.text-base{font-size:1rem;line-height:1.5rem}.text-lg{font-size:1.125rem;line-height:1.75rem}.text-sm{font-size:0.875rem;line-height:1.25rem}.text-2xl{font-size:1.5rem;line-height:2rem}.font-normal{font-weight:400}.font-semibold{font-weight:600}.font-bold{font-weight:700}.font-light{font-weight:300}.font-medium{font-weight:500}.uppercase{text-transform:uppercase}.leading-\[1\.15\]{line-height:1.15}.leading-none{line-height:1}.leading-relaxed{line-height:1.625}.tracking-tight{letter-spacing:-0.025em}.tracking-widest{letter-spacing:0.1em}.tracking-tighter{letter-spacing:-0.05em}.tracking-wider{letter-spacing:0.05em}.text-apple-dark{--tw-text-opacity:1;color:rgb(29 29 31 / var(--tw-text-opacity, 1))}.text-apple-gray{--tw-text-opacity:1;color:rgb(134 134 139 / var(--tw-text-opacity, 1))}.text-apple-blue{--tw-text-opacity:1;color:rgb(15 36 64 / var(--tw-text-opacity, 1))}.text-white{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.text-apple-light{--tw-text-opacity:1;color:rgb(245 245 247 / var(--tw-text-opacity, 1))}.text-red-500{--tw-text-opacity:1;color:rgb(239 68 68 / var(--tw-text-opacity, 1))}.text-green-500{--tw-text-opacity:1;color:rgb(34 197 94 / var(--tw-text-opacity, 1))}.text-green-600{--tw-text-opacity:1;color:rgb(22 163 74 / var(--tw-text-opacity, 1))}.text-green-800{--tw-text-opacity:1;color:rgb(22 101 52 / var(--tw-text-opacity, 1))}.text-white\/40{color:rgb(255 255 255 / 0.4)}.shadow-\[0_1px_3px_rgba\(0\2c 0\2c 0\2c 0\.04\)\2c 0_4px_12px_rgba\(0\2c 0\2c 0\2c 0\.03\)\]{--tw-shadow:0 1px 3px rgba(0,0,0,0.04),0 4px 12px rgba(0,0,0,0.03);--tw-shadow-colored:0 1px 3px var(--tw-shadow-color), 0 4px 12px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-2xl{--tw-shadow:0 25px 50px -12px rgb(0 0 0 / 0.25);--tw-shadow-colored:0 25px 50px -12px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-sm{--tw-shadow:0 1px 2px 0 rgb(0 0 0 / 0.05);--tw-shadow-colored:0 1px 2px 0 var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.transition-all{transition-property:all;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.transition-colors{transition-property:color, background-color, border-color, fill, stroke, -webkit-text-decoration-color;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, -webkit-text-decoration-color;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.transition-opacity{transition-property:opacity;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.transition-transform{transition-property:transform;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.duration-300{transition-duration:300ms}.duration-\[2500ms\]{transition-duration:2500ms}.duration-500{transition-duration:500ms}.duration-200{transition-duration:200ms}.ease-in-out{transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1)}.placeholder\:text-apple-gray\/40::placeholder{color:rgb(134 134 139 / 0.4)}.hover\:-translate-y-1:hover{--tw-translate-y:-0.25rem;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.hover\:scale-105:hover{--tw-scale-x:1.05;--tw-scale-y:1.05;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.hover\:bg-apple-blueHover:hover{--tw-bg-opacity:1;background-color:rgb(26 53 88 / var(--tw-bg-opacity, 1))}.hover\:bg-white\/10:hover{background-color:rgb(255 255 255 / 0.1)}.hover\:bg-black\/60:hover{background-color:rgb(0 0 0 / 0.6)}.hover\:bg-white\/20:hover{background-color:rgb(255 255 255 / 0.2)}.hover\:text-apple-dark:hover{--tw-text-opacity:1;color:rgb(29 29 31 / var(--tw-text-opacity, 1))}.hover\:text-white:hover{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.hover\:shadow-\[0_2px_8px_rgba\(0\2c 0\2c 0\2c 0\.06\)\2c 0_8px_24px_rgba\(0\2c 0\2c 0\2c 0\.06\)\]:hover{--tw-shadow:0 2px 8px rgba(0,0,0,0.06),0 8px 24px rgba(0,0,0,0.06);--tw-shadow-colored:0 2px 8px var(--tw-shadow-color), 0 8px 24px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.focus\:border-apple-blue:focus{--tw-border-opacity:1;border-color:rgb(15 36 64 / var(--tw-border-opacity, 1))}.focus\:outline-none:focus{outline:2px solid transparent;outline-offset:2px}.focus\:ring-2:focus{--tw-ring-offset-shadow:var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);--tw-ring-shadow:var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);box-shadow:var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000)}.focus\:ring-apple-blue\/30:focus{--tw-ring-color:rgb(15 36 64 / 0.3)}.group:hover .group-hover\:text-apple-blue{--tw-text-opacity:1;color:rgb(15 36 64 / var(--tw-text-opacity, 1))}@media (min-width: 640px){.sm\:right-4{right:1rem}.sm\:top-4{top:1rem}.sm\:right-6{right:1.5rem}.sm\:top-6{top:1.5rem}.sm\:mx-4{margin-left:1rem;margin-right:1rem}.sm\:my-8{margin-top:2rem;margin-bottom:2rem}.sm\:mb-12{margin-bottom:3rem}.sm\:mt-10{margin-top:2.5rem}.sm\:mt-4{margin-top:1rem}.sm\:mb-10{margin-bottom:2.5rem}.sm\:mb-2{margin-bottom:0.5rem}.sm\:mb-4{margin-bottom:1rem}.sm\:mb-6{margin-bottom:1.5rem}.sm\:mb-8{margin-bottom:2rem}.sm\:mt-5{margin-top:1.25rem}.sm\:mt-16{margin-top:4rem}.sm\:h-12{height:3rem}.sm\:h-7{height:1.75rem}.sm\:h-10{height:2.5rem}.sm\:w-auto{width:auto}.sm\:w-10{width:2.5rem}.sm\:w-12{width:3rem}.sm\:max-w-\[90\%\]{max-width:90%}.sm\:grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}.sm\:grid-cols-3{grid-template-columns:repeat(3, minmax(0, 1fr))}.sm\:flex-row{flex-direction:row}.sm\:gap-4{gap:1rem}.sm\:gap-6{gap:1.5rem}.sm\:gap-12{gap:3rem}.sm\:gap-5{gap:1.25rem}.sm\:gap-8{gap:2rem}.sm\:gap-3{gap:0.75rem}.sm\:space-y-5 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1.25rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1.25rem * var(--tw-space-y-reverse))}.sm\:p-6{padding:1.5rem}.sm\:p-12{padding:3rem}.sm\:p-8{padding:2rem}.sm\:px-6{padding-left:1.5rem;padding-right:1.5rem}.sm\:px-8{padding-left:2rem;padding-right:2rem}.sm\:py-20{padding-top:5rem;padding-bottom:5rem}.sm\:py-3{padding-top:0.75rem;padding-bottom:0.75rem}.sm\:py-4{padding-top:1rem;padding-bottom:1rem}.sm\:px-10{padding-left:2.5rem;padding-right:2.5rem}.sm\:py-3\.5{padding-top:0.875rem;padding-bottom:0.875rem}.sm\:py-8{padding-top:2rem;padding-bottom:2rem}.sm\:pb-20{padding-bottom:5rem}.sm\:pt-3{padding-top:0.75rem}.sm\:text-left{text-align:left}.sm\:text-sm{font-size:0.875rem;line-height:1.25rem}.sm\:text-4xl{font-size:2.25rem;line-height:2.5rem}.sm\:text-lg{font-size:1.125rem;line-height:1.75rem}.sm\:text-xl{font-size:1.25rem;line-height:1.75rem}.sm\:text-3xl{font-size:1.875rem;line-height:2.25rem}.sm\:text-base{font-size:1rem;line-height:1.5rem}}@media (min-width: 768px){.md\:my-16{margin-top:4rem;margin-bottom:4rem}.md\:mb-16{margin-bottom:4rem}.md\:mb-12{margin-bottom:3rem}.md\:flex{display:flex}.md\:hidden{display:none}.md\:max-w-\[860px\]{max-width:860px}.md\:grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}.md\:gap-16{gap:4rem}.md\:p-10{padding:2.5rem}.md\:py-24{padding-top:6rem;padding-bottom:6rem}.md\:text-5xl{font-size:3rem;line-height:1}.md\:text-4xl{font-size:2.25rem;line-height:2.5rem}.md\:text-lg{font-size:1.125rem;line-height:1.75rem}}@media (min-width: 1024px){.lg\:grid-cols-3{grid-template-columns:repeat(3, minmax(0, 1fr))}.lg\:gap-8{gap:2rem}.lg\:gap-20{gap:5rem}.lg\:p-12{padding:3rem}.lg\:py-32{padding-top:8rem;padding-bottom:8rem}.lg\:text-6xl{font-size:3.75rem;line-height:1}}</style></head>
+<body class="">
+
+<div class="overflow-x-hidden">
+
+  <!-- ==================== NAVBAR ==================== -->
+  <nav id="navbar" class="fixed top-0 left-0 right-0 z-50 nav-blur bg-white/80 border-b border-black/5 transition-all duration-300">
+    <div class="max-w-[980px] mx-auto px-4 sm:px-6 flex items-center justify-between h-11 sm:h-12">
+      <a href="#hero" class="flex items-center gap-2 group">
+        <img src="https://z-cdn-media.chatglm.cn/files/418b1ade-e020-4742-a372-4dbd996e4d67.png?auth_key=1882892359-c85133b5c54246c5b5e5e846725a96cc-0-dfb3b7df766ec6ecadfe22a647a94e30" alt="AntonProds Logo" class="h-6 sm:h-7 w-auto object-contain">
+        <span class="text-xs sm:text-sm font-semibold tracking-tight text-apple-dark group-hover:text-apple-blue transition-colors duration-300">AntonProds</span>
+      </a>
+      <div class="hidden md:flex items-center gap-6 lg:gap-8">
+        <a href="#proyectos" class="text-xs font-normal text-apple-gray hover:text-apple-dark transition-colors duration-300" data-i18n="Proyectos" data-i18n-en="Projects">Proyectos</a>
+        <a href="#sobre-mi" class="text-xs font-normal text-apple-gray hover:text-apple-dark transition-colors duration-300" data-i18n="Sobre mí" data-i18n-en="About me">Sobre mí</a>
+        <a href="#servicios" class="text-xs font-normal text-apple-gray hover:text-apple-dark transition-colors duration-300" data-i18n="Servicios" data-i18n-en="Services">Servicios</a>
+        <a href="#contacto" class="text-xs font-normal text-apple-gray hover:text-apple-dark transition-colors duration-300" data-i18n="Contacto" data-i18n-en="Contact">Contacto</a>
+        <button id="langToggle" onclick="toggleLang()" class="text-xs font-medium text-apple-gray hover:text-apple-dark transition-colors duration-300 px-2 py-1 rounded-lg hover:bg-black/5 ml-2" title="Switch language">
+          <span id="langLabel">EN</span>
+        </button>
+      </div>
+      <button id="menuToggle" class="md:hidden p-1.5 text-apple-dark btn-touch" aria-label="Menú">
+        <iconify-icon icon="lucide:menu" width="22" height="22"></iconify-icon>
+      </button>
+    </div>
+    <div id="mobileMenu" class="md:hidden bg-white/95 nav-blur border-t border-black/5">
+      <div class="max-w-[980px] mx-auto px-4 sm:px-6 py-3 sm:py-4 flex flex-col gap-3 sm:gap-4">
+        <a href="#proyectos" class="mobile-nav-link text-sm text-apple-gray hover:text-apple-dark transition-colors py-1" data-i18n="Proyectos" data-i18n-en="Projects">Proyectos</a>
+        <a href="#sobre-mi" class="mobile-nav-link text-sm text-apple-gray hover:text-apple-dark transition-colors py-1" data-i18n="Sobre mí" data-i18n-en="About me">Sobre mí</a>
+        <a href="#servicios" class="mobile-nav-link text-sm text-apple-gray hover:text-apple-dark transition-colors py-1" data-i18n="Servicios" data-i18n-en="Services">Servicios</a>
+        <a href="#contacto" class="mobile-nav-link text-sm text-apple-gray hover:text-apple-dark transition-colors py-1" data-i18n="Contacto" data-i18n-en="Contact">Contacto</a>
+        <button onclick="toggleLang(); document.getElementById('mobileMenu').classList.remove('open'); document.querySelector('#menuToggle iconify-icon').setAttribute('icon','lucide:menu')" class="text-sm text-apple-gray hover:text-apple-dark transition-colors py-1 flex items-center gap-2 mt-2 pt-2 border-t border-black/5">
+          🌐 <span id="langLabelMobile">EN</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ==================== HERO ==================== -->
+  <section id="hero" class="relative min-h-screen flex items-center pt-12 pb-16 sm:pb-20 px-4 sm:px-6 overflow-hidden">
+    <!-- Background Carousel -->
+    <div class="absolute inset-0 z-0">
+      <div id="heroSlide0" class="absolute inset-0 transition-opacity duration-[2500ms] ease-in-out" style="opacity: 1;">
+        <img src="Side_A.jpg" alt="" class="w-full h-full object-cover scale-105">
+      </div>
+      <div id="heroSlide1" class="absolute inset-0 transition-opacity duration-[2500ms] ease-in-out" style="opacity: 0;">
+        <img src="https://z-cdn-media.chatglm.cn/files/77f17c2c-fc37-40a9-93ac-3958a7be5202.jpg?auth_key=1882892802-944c1d2440be4767b227a2c240d01462-0-03207cd9dd3974c992ca4b207b212741" alt="" class="w-full h-full object-cover scale-105">
+      </div>
+      <div id="heroSlide2" class="absolute inset-0 transition-opacity duration-[2500ms] ease-in-out" style="opacity: 0;">
+        <img src="https://z-cdn-media.chatglm.cn/files/4fa24af6-400b-4268-bc5d-4748872130c0.jpg?auth_key=1882894414-b26f5556431f4b78b6d33bd868296ef3-0-33184fbcd8eb94ccaed15b6ce024a72f" alt="" class="w-full h-full object-cover scale-105">
+      </div>
+      <div id="heroSlide3" class="absolute inset-0 transition-opacity duration-[2500ms] ease-in-out" style="opacity: 0;">
+        <img src="fernando-anton-r-reloj-02.jpg" alt="" class="w-full h-full object-cover scale-105">
+      </div>
+      <div class="absolute inset-0 bg-black/40"></div>
+    </div>
+
+    <!-- Content -->
+    <div class="relative z-10 max-w-[680px] w-full mx-auto text-center">
+      
+      <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.15] text-white animate-fade-up" style="animation-delay:0.4s;opacity:0;">
+        <span data-i18n="Creo experiencias digitales únicas." data-i18n-en="I create unique digital experiences.">Creo experiencias digitales únicas.</span>
+      </h1>
+  
+     
+      <div class="mt-8 sm:mt-10 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 animate-fade-up" style="animation-delay:1s;opacity:0;">
+        <a href="#proyectos" class="bg-apple-blue hover:bg-apple-blueHover text-white text-sm font-medium px-7 sm:px-8 py-2.5 sm:py-3 rounded-full transition-all duration-300 hover:scale-105 min-h-[44px] flex items-center w-full sm:w-auto justify-center" data-i18n="Ver proyectos" data-i18n-en="View projects">Ver proyectos</a>
+        <a href="#contacto" class="text-white text-sm font-medium px-7 sm:px-8 py-2.5 sm:py-3 rounded-full border border-white/30 hover:bg-white/10 transition-all duration-300 min-h-[44px] flex items-center w-full sm:w-auto justify-center" data-i18n="Hablemos" data-i18n-en="Let's talk">Hablemos</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== PROYECTOS ==================== -->
+  <section id="proyectos" class="py-16 sm:py-20 md:py-24 lg:py-32 px-4 sm:px-6 bg-apple-light">
+    <div class="max-w-[980px] mx-auto">
+      <div class="text-center mb-10 sm:mb-12 md:mb-16">
+        <p class="text-apple-blue text-xs font-semibold tracking-widest uppercase mb-3 reveal active" data-i18n="Portafolio" data-i18n-en="Portfolio">Portafolio</p>
+        <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight reveal reveal-delay-1 active" data-i18n="Proyectos seleccionados" data-i18n-en="Selected projects">Proyectos seleccionados</h2>
+        <p class="mt-3 sm:mt-4 text-apple-gray text-base sm:text-lg font-light reveal reveal-delay-2 active"><br></p>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+
+        <!-- Project 1 - E-commerce Premium -->
+        <div class="project-card bg-white rounded-2xl overflow-hidden cursor-pointer reveal active" onclick="openModal('modal1')">
+          <div class="overflow-hidden aspect-[4/3]">
+            <img src="Side_A.jpg" alt="E-commerce Premium" class="project-img w-full h-full object-cover">
+          </div>
+          <div class="p-5 sm:p-6 flex items-center justify-between">
+            <h3 class="text-lg sm:text-xl font-bold tracking-tight" data-i18n="Visualización industrial" data-i18n-en="Industrial visualization">Visualización industrial</h3>
+            <div class="flex items-center gap-1.5 text-apple-blue text-sm font-medium link-arrow shrink-0">
+              <span data-i18n="Ver detalle" data-i18n-en="View details">Ver detalle</span>
+              <iconify-icon icon="lucide:arrow-right" width="14" height="14" class="arrow-icon transition-transform duration-300"></iconify-icon>
+            </div>
+          </div>
+        </div>
+
+        <!-- Project 2 - Fernando Anton R -->
+        <div class="project-card bg-white rounded-2xl overflow-hidden cursor-pointer reveal reveal-delay-1 active" onclick="openModal('modal2')">
+          <div class="overflow-hidden aspect-[4/3]">
+            <img src="https://z-cdn-media.chatglm.cn/files/77f17c2c-fc37-40a9-93ac-3958a7be5202.jpg?auth_key=1882892802-944c1d2440be4767b227a2c240d01462-0-03207cd9dd3974c992ca4b207b212741" alt="Fernando Anton R Jordan Roja" class="project-img w-full h-full object-cover">
+          </div>
+          <div class="p-5 sm:p-6 flex items-center justify-between">
+            <h3 class="text-lg sm:text-xl font-bold tracking-tight" data-i18n="Nike Jordan" data-i18n-en="Nike Jordan">Nike Jordan</h3>
+            <div class="flex items-center gap-1.5 text-apple-blue text-sm font-medium link-arrow shrink-0">
+              <span data-i18n="Ver detalle" data-i18n-en="View details">Ver detalle</span>
+              <iconify-icon icon="lucide:arrow-right" width="14" height="14" class="arrow-icon transition-transform duration-300"></iconify-icon>
+            </div>
+          </div>
+        </div>
+
+        <!-- Project 3 - TOUS MANIFESTO -->
+        <div class="project-card bg-white rounded-2xl overflow-hidden cursor-pointer reveal reveal-delay-2 active" onclick="openModal('modal3')">
+          <div class="overflow-hidden aspect-[4/3]">
+            <img src="fernando-anton-r-tous-manifesto-03.jpg" alt="TOUS MANIFESTO" class="project-img w-full h-full object-cover">
+          </div>
+          <div class="p-5 sm:p-6 flex items-center justify-between">
+            <h3 class="text-lg sm:text-xl font-bold tracking-tight" data-i18n="Tous Manifesto" data-i18n-en="Tous Manifesto">Tous Manifesto</h3>
+            <div class="flex items-center gap-1.5 text-apple-blue text-sm font-medium link-arrow shrink-0">
+              <span data-i18n="Ver detalle" data-i18n-en="View details">Ver detalle</span>
+              <iconify-icon icon="lucide:arrow-right" width="14" height="14" class="arrow-icon transition-transform duration-300"></iconify-icon>
+            </div>
+          </div>
+        </div>
+
+        <!-- Project 4 - Panel de Analytics -->
+        <div class="project-card bg-white rounded-2xl overflow-hidden cursor-pointer reveal reveal-delay-1 active" onclick="openModal('modal4')">
+          <div class="overflow-hidden aspect-[4/3]">
+            <img src="fernando-anton-r-reloj-02.jpg" alt="Panel de Analytics" class="project-img w-full h-full object-cover">
+          </div>
+          <div class="p-5 sm:p-6 flex items-center justify-between">
+            <h3 class="text-lg sm:text-xl font-bold tracking-tight" data-i18n="Reloj Extendra" data-i18n-en="Extendra Watch">Reloj Extendra</h3>
+            <div class="flex items-center gap-1.5 text-apple-blue text-sm font-medium link-arrow shrink-0">
+              <span data-i18n="Ver detalle" data-i18n-en="View details">Ver detalle</span>
+              <iconify-icon icon="lucide:arrow-right" width="14" height="14" class="arrow-icon transition-transform duration-300"></iconify-icon>
+            </div>
+          </div>
+        </div>
+
+        <!-- Project 5 - Proyecto Visual -->
+        <div class="project-card bg-white rounded-2xl overflow-hidden cursor-pointer reveal reveal-delay-2 active" onclick="openModal('modal5')">
+          <div class="overflow-hidden aspect-[4/3]">
+            <img src="5.jpg" alt="Proyecto Visual" class="project-img w-full h-full object-cover">
+          </div>
+          <div class="p-5 sm:p-6 flex items-center justify-between">
+            <h3 class="text-lg sm:text-xl font-bold tracking-tight" data-i18n="Visualización interiores" data-i18n-en="Interior visualization">Visualización interiores</h3>
+            <div class="flex items-center gap-1.5 text-apple-blue text-sm font-medium link-arrow shrink-0">
+              <span data-i18n="Ver detalle" data-i18n-en="View details">Ver detalle</span>
+              <iconify-icon icon="lucide:arrow-right" width="14" height="14" class="arrow-icon transition-transform duration-300"></iconify-icon>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== SOBRE MÍ ==================== -->
+  <section id="sobre-mi" class="py-16 sm:py-20 md:py-24 lg:py-32 px-4 sm:px-6 bg-white">
+    <div class="max-w-[980px] mx-auto">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-12 md:gap-16 lg:gap-20 items-center">
+        <div class="reveal active">
+          <div class="aspect-[4/5] rounded-2xl overflow-hidden bg-black flex items-center justify-center p-8 sm:p-12">
+            <img src="LOGO_TRAS_BLANCO.jpg" alt="AntonProds Logo" class="w-full h-full object-contain">
+          </div>
+        </div>
+        <div>
+          <p class="text-apple-blue text-xs font-semibold tracking-widest uppercase mb-3 reveal active"><span style="font-size: 20px;"><span style="font-size: 32px;" data-i18n="Sobre mí" data-i18n-en="About me">Sobre mí</span></span></p>
+          <p class="text-apple-gray font-light leading-relaxed text-base sm:text-lg mb-4 sm:mb-6 reveal reveal-delay-2 active" style="text-align: justify; "><span data-i18n="Transformo modelos CAD y geometrías técnicas complejas en assets 3D optimizados, organizados y visualmente impecables. Trabajo con maquinaria industrial, piezas técnicas y productos premium, preparando cada modelo para su uso directo en renders, animaciones, presentaciones corporativas o experiencias interactivas en tiempo real. Mi enfoque parte de entender a fondo lo que el cliente necesita, escuchar con atención sus ideas y traducirlas en resultados claros, funcionales y alineados con su visión, sin perder nunca de vista una ejecución sólida y realista." data-i18n-en="I transform CAD models and complex technical geometries into optimized, organized, and visually impeccable 3D assets. I work with industrial machinery, technical parts, and premium products, preparing each model for direct use in renders, animations, corporate presentations, or real-time interactive experiences. My approach starts from thoroughly understanding what the client needs, carefully listening to their ideas, and translating them into clear, functional results aligned with their vision, without ever losing sight of solid and realistic execution.">Transformo modelos CAD y geometrías técnicas complejas en assets 3D optimizados, organizados y visualmente impecables. Trabajo con maquinaria industrial, piezas técnicas y productos premium, preparando cada modelo para su uso directo en renders, animaciones, presentaciones corporativas o experiencias interactivas en tiempo real. Mi enfoque parte de entender a fondo lo que el cliente necesita, escuchar con atención sus ideas y traducirlas en resultados claros, funcionales y alineados con su visión, sin perder nunca de vista una ejecución sólida y realista.</span></p>
+          <p class="text-apple-gray font-light leading-relaxed text-base sm:text-lg mb-6 sm:mb-8 reveal reveal-delay-3 active"><br></p>
+          <div class="grid grid-cols-3 gap-4 sm:gap-6 reveal reveal-delay-4 active">
+            <div>
+              <p class="text-2xl sm:text-3xl md:text-4xl font-bold text-apple-dark"><br></p></div><div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== SERVICIOS ==================== -->
+  <section id="servicios" class="py-16 sm:py-20 md:py-24 lg:py-32 px-4 sm:px-6 bg-apple-light">
+    <div class="max-w-[980px] mx-auto">
+      <div class="text-center mb-10 sm:mb-12 md:mb-16">
+        <p class="text-apple-blue text-xs font-semibold tracking-widest uppercase mb-3 reveal active" data-i18n="Servicios" data-i18n-en="Services">Servicios</p>
+        <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight reveal reveal-delay-1 active" data-i18n="Lo que hago" data-i18n-en="What I do">Lo que hago</h2>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+        <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_2px_8px_rgba(0,0,0,0.06),0_8px_24px_rgba(0,0,0,0.06)] transition-all duration-500 hover:-translate-y-1 reveal active">
+          <span class="text-3xl sm:text-4xl font-bold text-apple-light tracking-tighter leading-none">01</span>
+          <h3 class="text-base sm:text-lg font-semibold text-apple-dark mt-3 sm:mt-4 mb-2 tracking-tight" data-i18n="Optimización de geometría" data-i18n-en="Geometry optimization">Optimización de geometría</h3>
+          <p class="text-apple-gray text-sm font-light leading-relaxed"><span data-i18n="Modelado eficiente con topología limpia para máximo rendimiento en tiempo real." data-i18n-en="Efficient modeling with clean topology for maximum real-time performance.">Modelado eficiente con topología limpia para máximo rendimiento en tiempo real.</span></p>
+        </div>
+        <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_2px_8px_rgba(0,0,0,0.06),0_8px_24px_rgba(0,0,0,0.06)] transition-all duration-500 hover:-translate-y-1 reveal reveal-delay-1 active">
+          <span class="text-3xl sm:text-4xl font-bold text-apple-light tracking-tighter leading-none">02</span>
+          <h3 class="text-base sm:text-lg font-semibold text-apple-dark mt-3 sm:mt-4 mb-2 tracking-tight" data-i18n="Materiales PBR" data-i18n-en="PBR Materials">Materiales PBR</h3>
+          <p class="text-apple-gray text-sm font-light leading-relaxed"><span data-i18n="Texturas y materiales de alta fidelidad que aportan realismo a cada proyecto." data-i18n-en="High-fidelity textures and materials that bring realism to every project.">Texturas y materiales de alta fidelidad que aportan realismo a cada proyecto.</span></p>
+        </div>
+        <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_2px_8px_rgba(0,0,0,0.06),0_8px_24px_rgba(0,0,0,0.06)] transition-all duration-500 hover:-translate-y-1 reveal reveal-delay-2 active">
+          <span class="text-3xl sm:text-4xl font-bold text-apple-light tracking-tighter leading-none">03</span>
+          <h3 class="text-base sm:text-lg font-semibold text-apple-dark mt-3 sm:mt-4 mb-2 tracking-tight" data-i18n="Visualización de producto" data-i18n-en="Product visualization">Visualización de producto</h3>
+          <p class="text-apple-gray text-sm font-light leading-relaxed"><span data-i18n="Renderizados fotorrealistas que destacan cada detalle del producto." data-i18n-en="Photorealistic renders that highlight every product detail.">Renderizados fotorrealistas que destacan cada detalle del producto.</span></p>
+        </div>
+        <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_2px_8px_rgba(0,0,0,0.06),0_8px_24px_rgba(0,0,0,0.06)] transition-all duration-500 hover:-translate-y-1 reveal reveal-delay-1 active">
+          <span class="text-3xl sm:text-4xl font-bold text-apple-light tracking-tighter leading-none">04</span>
+          <h3 class="text-base sm:text-lg font-semibold text-apple-dark mt-3 sm:mt-4 mb-2 tracking-tight" data-i18n="Estética premium" data-i18n-en="Premium aesthetics">Estética premium</h3>
+          <p class="text-apple-gray text-sm font-light leading-relaxed"><span data-i18n="Equilibrio perfecto entre calidad visual y eficiencia técnica." data-i18n-en="Perfect balance between visual quality and technical efficiency.">Equilibrio perfecto entre calidad visual y eficiencia técnica.</span></p>
+        </div>
+        <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_2px_8px_rgba(0,0,0,0.06),0_8px_24px_rgba(0,0,0,0.06)] transition-all duration-500 hover:-translate-y-1 reveal reveal-delay-2 active">
+          <span class="text-3xl sm:text-4xl font-bold text-apple-light tracking-tighter leading-none">05</span>
+          <h3 class="text-base sm:text-lg font-semibold text-apple-dark mt-3 sm:mt-4 mb-2 tracking-tight" data-i18n="Producción optimizada" data-i18n-en="Optimized production">Producción optimizada</h3>
+          <p class="text-apple-gray text-sm font-light leading-relaxed"><span data-i18n="Flujos de trabajo orientados a resultados sin perder calidad visual." data-i18n-en="Results-driven workflows without losing visual quality.">Flujos de trabajo orientados a resultados sin perder calidad visual.</span></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== CONTACTO ==================== -->
+  <section id="contacto" class="py-16 sm:py-20 md:py-24 lg:py-32 px-4 sm:px-6 bg-apple-light">
+    <div class="max-w-[680px] mx-auto text-center">
+      <p class="text-apple-blue text-xs font-semibold tracking-widest uppercase mb-3 reveal active" data-i18n="Contacto" data-i18n-en="Contact">Contacto</p>
+      <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight mb-3 sm:mb-4 reveal reveal-delay-1 active" data-i18n="Hablemos de tu proyecto." data-i18n-en="Let's talk about your project.">Hablemos de tu proyecto.</h2>
+      <p class="text-apple-gray text-base sm:text-lg font-light mb-8 sm:mb-10 md:mb-12 reveal reveal-delay-2 active"><span data-i18n="¿Tienes una idea? Me encantaría escucharla. Escríbeme y respondo en menos de 24 horas." data-i18n-en="Got an idea? I'd love to hear it. Write to me and I'll respond within 24 hours.">¿Tienes una idea? Me encantaría escucharla. Escríbeme y respondo en menos de 24 horas.</span></p>
+
+      <form id="contactForm" class="text-left space-y-4 sm:space-y-5 reveal reveal-delay-3 active" action="https://formspree.io/f/xykryenq" method="POST">
+        <div id="formFields">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+            <div>
+              <label for="name" class="block text-xs font-medium text-apple-gray mb-1.5 sm:mb-2" data-i18n="Nombre" data-i18n-en="Name">Nombre</label>
+              <input type="text" id="name" name="name" required="" placeholder="Tu nombre" data-ph-en="Your name" class="w-full px-4 py-3.5 sm:py-3 bg-white border border-black/10 rounded-xl text-sm placeholder:text-apple-gray/40 focus:outline-none focus:ring-2 focus:ring-apple-blue/30 focus:border-apple-blue transition-all duration-300 min-h-[44px]">
+            </div>
+            <div>
+              <label for="email" class="block text-xs font-medium text-apple-gray mb-1.5 sm:mb-2">Email</label>
+              <input type="email" id="email" name="email" required="" placeholder="tu@email.com" class="w-full px-4 py-3.5 sm:py-3 bg-white border border-black/10 rounded-xl text-sm placeholder:text-apple-gray/40 focus:outline-none focus:ring-2 focus:ring-apple-blue/30 focus:border-apple-blue transition-all duration-300 min-h-[44px]">
+            </div>
+          </div>
+          <div class="mt-4 sm:mt-5">
+            <label for="subject" class="block text-xs font-medium text-apple-gray mb-1.5 sm:mb-2" data-i18n="Asunto" data-i18n-en="Subject">Asunto</label>
+            <input type="text" id="subject" name="subject" placeholder="¿De qué quieres hablar?" data-ph-en="What would you like to discuss?" class="w-full px-4 py-3.5 sm:py-3 bg-white border border-black/10 rounded-xl text-sm placeholder:text-apple-gray/40 focus:outline-none focus:ring-2 focus:ring-apple-blue/30 focus:border-apple-blue transition-all duration-300 min-h-[44px]">
+          </div>
+          <div class="mt-4 sm:mt-5">
+            <label for="message" class="block text-xs font-medium text-apple-gray mb-1.5 sm:mb-2" data-i18n="Mensaje" data-i18n-en="Message">Mensaje</label>
+            <textarea id="message" name="message" rows="5" required="" placeholder="Cuéntame los detalles de tu proyecto..." data-ph-en="Tell me about your project details..." class="w-full px-4 py-3.5 sm:py-3 bg-white border border-black/10 rounded-xl text-sm placeholder:text-apple-gray/40 focus:outline-none focus:ring-2 focus:ring-apple-blue/30 focus:border-apple-blue transition-all duration-300 resize-none min-h-[120px]"></textarea>
+          </div>
+          <div id="formErrorMsg" class="hidden text-center text-red-500 text-sm mb-2"><span data-i18n="Error al enviar. Inténtalo de nuevo." data-i18n-en="Error sending. Please try again.">Error al enviar. Inténtalo de nuevo.</span></div>
+          <div class="text-center pt-2 sm:pt-3 mt-4 sm:mt-5">
+            <button type="submit" class="bg-apple-blue hover:bg-apple-blueHover text-white text-sm font-medium px-8 sm:px-10 py-3 sm:py-3.5 rounded-full transition-all duration-300 hover:scale-105 inline-flex items-center gap-2 min-h-[44px]">
+              <span data-i18n="Enviar mensaje" data-i18n-en="Send message">Enviar mensaje</span>
+              <iconify-icon icon="lucide:send" width="15" height="15"></iconify-icon>
+            </button>
+          </div>
+        </div>
+        <div id="formSuccess" class="hidden mt-8 p-6 bg-green-50 border border-green-200 rounded-2xl text-center">
+          <iconify-icon icon="lucide:check-circle" width="32" height="32" class="text-green-500 mb-2"></iconify-icon>
+          <p class="text-green-800 font-medium" data-i18n="¡Mensaje enviado!" data-i18n-en="Message sent!">¡Mensaje enviado!</p>
+          <p class="text-green-600 text-sm mt-1" data-i18n="Te responderé lo antes posible." data-i18n-en="I'll get back to you as soon as possible.">Te responderé lo antes posible.</p>
+        </div>
+      </form>
+
+      <div class="mt-12 sm:mt-16 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8 reveal reveal-delay-4 active">
+        <a href="mailto:antonprods@proton.me" class="flex items-center gap-2 text-apple-gray hover:text-apple-dark transition-colors duration-300 text-sm min-h-[44px]">
+          <iconify-icon icon="lucide:mail" width="16" height="16"></iconify-icon>
+          antonprods@proton.me&nbsp;&nbsp;
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="bg-apple-dark text-white/40 py-6 sm:py-8 px-4 sm:px-6 mt-auto">
+    <div class="max-w-[980px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
+      <p class="text-xs text-center sm:text-left"><span data-i18n="© 2026 AntonProds. Todos los derechos reservados." data-i18n-en="© 2026 AntonProds. All rights reserved.">© 2026 AntonProds. Todos los derechos reservados.</span></p>
+      <div class="flex items-center gap-5 sm:gap-6">
+        <a href="#" class="hover:text-white transition-colors duration-300 min-h-[44px] flex items-center" aria-label="LinkedIn">
+          <iconify-icon icon="lucide:linkedin" width="16" height="16"></iconify-icon>
+        </a>
+        <a href="#" class="hover:text-white transition-colors duration-300 min-h-[44px] flex items-center" aria-label="ArtStation">
+          <iconify-icon icon="simple-icons:artstation" width="16" height="16"></iconify-icon>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ==================== MODALS ==================== -->
+
+  <!-- MODAL 1: E-commerce Premium -->
+  <div id="modal1" class="modal-overlay fixed inset-0 z-[100] bg-black/60 nav-blur flex items-start justify-center overflow-y-auto" onclick="if(event.target===this)closeModal()">
+    <div class="modal-panel bg-white w-full max-w-[95%] sm:max-w-[90%] md:max-w-[860px] my-4 sm:my-8 md:my-16 mx-2 sm:mx-4 rounded-2xl overflow-hidden shadow-2xl">
+      <div class="relative aspect-[16/9] overflow-hidden">
+        <img src="Side_A.jpg" alt="E-commerce" class="w-full h-full object-cover">
+        <button onclick="closeModal()" class="absolute top-3 sm:top-4 right-3 sm:right-4 w-9 h-9 sm:w-10 sm:h-10 bg-black/40 hover:bg-black/60 nav-blur rounded-full flex items-center justify-center text-white transition-colors duration-200">
+          <iconify-icon icon="lucide:x" width="16" height="16"></iconify-icon>
+        </button>
+      </div><div class="p-5 sm:p-8 md:p-10 lg:p-12">
+        <p class="text-apple-gray font-light leading-relaxed text-sm sm:text-base mb-6 sm:mb-8" style="text-align: justify;"></p><h2 class="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight mt-2 mb-3 sm:mb-4" style="--tw-border-spacing-y: 0; --tw-translate-x: 0; --tw-translate-y: 0; --tw-rotate: 0; --tw-skew-x: 0; --tw-skew-y: 0; --tw-scale-x: 1; --tw-scale-y: 1; --tw-pan-x: ; --tw-pan-y: ; --tw-pinch-zoom: ; --tw-scroll-snap-strictness: proximity; --tw-gradient-from-position: ; --tw-gradient-via-position: ; --tw-gradient-to-position: ; --tw-ordinal: ; --tw-slashed-zero: ; --tw-numeric-figure: ; --tw-numeric-spacing: ; --tw-numeric-fraction: ; --tw-ring-inset: ; --tw-ring-offset-width: 0px; --tw-ring-offset-color: #fff; --tw-ring-color: rgb(59 130 246 / 0.5); --tw-ring-offset-shadow: 0 0 #0000; --tw-ring-shadow: 0 0 #0000; --tw-shadow: 0 0 #0000; --tw-shadow-colored: 0 0 #0000; --tw-blur: ; --tw-brightness: ; --tw-contrast: ; --tw-grayscale: ; --tw-hue-rotate: ; --tw-invert: ; --tw-saturate: ; --tw-sepia: ; --tw-drop-shadow: ; --tw-backdrop-blur: ; --tw-backdrop-brightness: ; --tw-backdrop-contrast: ; --tw-backdrop-grayscale: ; --tw-backdrop-hue-rotate: ; --tw-backdrop-invert: ; --tw-backdrop-opacity: ; --tw-backdrop-saturate: ; --tw-backdrop-sepia: ; --tw-contain-size: ; --tw-contain-layout: ; --tw-contain-paint: ; --tw-contain-style: ;" data-i18n="Visualización Industrial" data-i18n-en="Industrial Visualization">Visualización Industrial</h2>
+        <div class="aspect-video rounded-xl overflow-hidden mb-6 sm:mb-8">
+          <iframe src="https://www.youtube.com/embed/u3Ynf-xGlGE" class="w-full h-full" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen="" title="E-commerce Premium Video"></iframe>
+        </div>
+        <div class="grid grid-cols-2 gap-2 sm:gap-3">
+          <div class="aspect-[4/3] rounded-xl overflow-hidden"><img src="Side_A.jpg" alt="Detalle 1" onclick="openLightbox(this.src)" class="modal-gallery-img w-full h-full object-cover cursor-pointer"></div>
+          <div class="aspect-[4/3] rounded-xl overflow-hidden"><img src="Side_B.jpg" alt="Detalle 2" onclick="openLightbox(this.src)" class="modal-gallery-img w-full h-full object-cover cursor-pointer"></div>
+          <div class="aspect-[4/3] rounded-xl overflow-hidden"><img src="Side_D.jpg" alt="Detalle 3" onclick="openLightbox(this.src)" class="modal-gallery-img w-full h-full object-cover cursor-pointer"></div>
+          <div class="aspect-[4/3] rounded-xl overflow-hidden"><img src="Container_A.jpg" alt="Detalle 4" onclick="openLightbox(this.src)" class="modal-gallery-img w-full h-full object-cover cursor-pointer"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 2: Fernando Anton R — Jordan Roja -->
+  <div id="modal2" class="modal-overlay fixed inset-0 z-[100] bg-black/60 nav-blur flex items-start justify-center overflow-y-auto" onclick="if(event.target===this)closeModal()">
+    <div class="modal-panel bg-white w-full max-w-[95%] sm:max-w-[90%] md:max-w-[860px] my-4 sm:my-8 md:my-16 mx-2 sm:mx-4 rounded-2xl overflow-hidden shadow-2xl">
+      <div class="relative aspect-[16/9] overflow-hidden bg-black">
+        <img src="https://z-cdn-media.chatglm.cn/files/77f17c2c-fc37-40a9-93ac-3958a7be5202.jpg?auth_key=1882892802-944c1d2440be4767b227a2c240d01462-0-03207cd9dd3974c992ca4b207b212741" alt="Jordan Roja" class="w-full h-full object-cover">
+        <button onclick="closeModal()" class="absolute top-3 sm:top-4 right-3 sm:right-4 w-9 h-9 sm:w-10 sm:h-10 bg-black/40 hover:bg-black/60 nav-blur rounded-full flex items-center justify-center text-white transition-colors duration-200">
+          <iconify-icon icon="lucide:x" width="16" height="16"></iconify-icon>
+        </button>
+      </div>
+      <div class="p-5 sm:p-8 md:p-10 lg:p-12"><br><h2 class="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight mt-2 mb-3 sm:mb-4" data-i18n="Nike Jordan" data-i18n-en="Nike Jordan">Nike Jordan</h2>
+        <div class="grid grid-cols-2 gap-2 sm:gap-3">
+          <div class="aspect-[4/3] rounded-xl overflow-hidden bg-black"><img src="https://z-cdn-media.chatglm.cn/files/77f17c2c-fc37-40a9-93ac-3958a7be5202.jpg?auth_key=1882892802-944c1d2440be4767b227a2c240d01462-0-03207cd9dd3974c992ca4b207b212741" alt="Jordan ángulo 2" onclick="openLightbox(this.src)" class="modal-gallery-img w-full h-full object-cover cursor-pointer"></div>
+          <div class="aspect-[4/3] rounded-xl overflow-hidden bg-black"><img src="fernando-anton-r-jordan-roja-01.jpg" alt="Jordan detalle" onclick="openLightbox(this.src)" class="modal-gallery-img w-full h-full object-cover cursor-pointer"></div>
+          <div class="aspect-[4/3] rounded-xl overflow-hidden bg-black"><img src="fernando-anton-r-jordan-roja-02.jpg" alt="Jordan sole" onclick="openLightbox(this.src)" class="modal-gallery-img w-full h-full object-cover cursor-pointer"></div>
+          <div class="aspect-[4/3] rounded-xl overflow-hidden bg-black"><img src="fernando-anton-r-jordan-roja-06.jpg" alt="Jordan lateral" onclick="openLightbox(this.src)" class="modal-gallery-img w-full h-full object-cover cursor-pointer"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 3: TOUS MANIFESTO -->
+  <div id="modal3" class="modal-overlay fixed inset-0 z-[100] bg-black/60 nav-blur flex items-start justify-center overflow-y-auto" onclick="if(event.target===this)closeModal()">
+    <div class="modal-panel bg-white w-full max-w-[95%] sm:max-w-[90%] md:max-w-[860px] my-4 sm:my-8 md:my-16 mx-2 sm:mx-4 rounded-2xl overflow-hidden shadow-2xl">
+      <div class="relative aspect-[16/9] overflow-hidden">
+        <img src="fernando-anton-r-tous-manifesto-03.jpg" alt="TOUS MANIFESTO" class="w-full h-full object-cover">
+        <button onclick="closeModal()" class="absolute top-3 sm:top-4 right-3 sm:right-4 w-9 h-9 sm:w-10 sm:h-10 bg-black/40 hover:bg-black/60 nav-blur rounded-full flex items-center justify-center text-white transition-colors duration-200">
+          <iconify-icon icon="lucide:x" width="16" height="16"></iconify-icon>
+        </button>
+      </div>
+      <div class="p-5 sm:p-8 md:p-10 lg:p-12"><h2 class="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight mt-2 mb-3 sm:mb-4" data-i18n="Tous Manifesto" data-i18n-en="Tous Manifesto">Tous Manifesto</h2>
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
+          <div class="aspect-[4/3] rounded-xl overflow-hidden"><img src="fernando-anton-r-tous-manifesto-03.jpg" alt="TOUS MANIFESTO 1" onclick="openLightbox(this.src)" class="modal-gallery-img w-full h-full object-cover cursor-pointer"></div>
+          <div class="aspect-[4/3] rounded-xl overflow-hidden"><img src="fernando-anton-r-tous-manifesto-13.jpg" alt="TOUS MANIFESTO 2" onclick="openLightbox(this.src)" class="modal-gallery-img w-full h-full object-cover cursor-pointer"></div>
+          <div class="aspect-[4/3] rounded-xl overflow-hidden"><img src="fernando-anton-r-tous-manifesto-14.jpg" alt="TOUS MANIFESTO 3" onclick="openLightbox(this.src)" class="modal-gallery-img w-full h-full object-cover cursor-pointer"></div>
+          <div class="aspect-[4/3] rounded-xl overflow-hidden"><img src="fernando-anton-r-tous-manifesto-11.jpg" alt="TOUS MANIFESTO 4" onclick="openLightbox(this.src)" class="modal-gallery-img w-full h-full object-cover cursor-pointer"></div>
+          <div class="aspect-[4/3] rounded-xl overflow-hidden"><img src="fernando-anton-r-tous-manifesto-12.jpg" alt="TOUS MANIFESTO 5" onclick="openLightbox(this.src)" class="modal-gallery-img w-full h-full object-cover cursor-pointer"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 4: Panel de Analytics -->
+  <div id="modal4" class="modal-overlay fixed inset-0 z-[100] bg-black/60 nav-blur flex items-start justify-center overflow-y-auto" onclick="if(event.target===this)closeModal()">
+    <div class="modal-panel bg-white w-full max-w-[95%] sm:max-w-[90%] md:max-w-[860px] my-4 sm:my-8 md:my-16 mx-2 sm:mx-4 rounded-2xl overflow-hidden shadow-2xl">
+      <div class="relative aspect-[16/9] overflow-hidden">
+        <img src="fernando-anton-r-reloj-02.jpg" alt="Dashboard" class="w-full h-full object-cover">
+        <button onclick="closeModal()" class="absolute top-3 sm:top-4 right-3 sm:right-4 w-9 h-9 sm:w-10 sm:h-10 bg-black/40 hover:bg-black/60 nav-blur rounded-full flex items-center justify-center text-white transition-colors duration-200">
+          <iconify-icon icon="lucide:x" width="16" height="16"></iconify-icon>
+        </button>
+      </div><div class="p-5 sm:p-8 md:p-10 lg:p-12"><h2 class="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight mt-2 mb-3 sm:mb-4" data-i18n="Reloj Extendra" data-i18n-en="Extendra Watch">Reloj Extendra</h2><div class="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3"><div class="aspect-[4/3] rounded-xl overflow-hidden"><img src="fernando-anton-r-reloj-01.jpg" alt="Panel de Analytics 1" onclick="openLightbox(this.src)" class="modal-gallery-img w-full h-full object-cover cursor-pointer"></div>
+          <div class="aspect-[4/3] rounded-xl overflow-hidden"><img src="fernando-anton-r-reloj-02.jpg" alt="Panel de Analytics 2" onclick="openLightbox(this.src)" class="modal-gallery-img w-full h-full object-cover cursor-pointer"></div>
+          <div class="aspect-[4/3] rounded-xl overflow-hidden"><img src="fernando-anton-r-reloj-03.jpg" alt="Panel de Analytics 3" onclick="openLightbox(this.src)" class="modal-gallery-img w-full h-full object-cover cursor-pointer"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 5: Proyecto Visual -->
+  <div id="modal5" class="modal-overlay fixed inset-0 z-[100] bg-black/60 nav-blur flex items-start justify-center overflow-y-auto" onclick="if(event.target===this)closeModal()">
+    <div class="modal-panel bg-white w-full max-w-[95%] sm:max-w-[90%] md:max-w-[860px] my-4 sm:my-8 md:my-16 mx-2 sm:mx-4 rounded-2xl overflow-hidden shadow-2xl">
+      <div class="relative aspect-[16/9] overflow-hidden">
+        <img src="5.jpg" alt="Proyecto Visual" class="w-full h-full object-cover">
+        <button onclick="closeModal()" class="absolute top-3 sm:top-4 right-3 sm:right-4 w-9 h-9 sm:w-10 sm:h-10 bg-black/40 hover:bg-black/60 nav-blur rounded-full flex items-center justify-center text-white transition-colors duration-200">
+          <iconify-icon icon="lucide:x" width="16" height="16"></iconify-icon>
+        </button>
+      </div>
+      <div class="p-5 sm:p-8 md:p-10 lg:p-12"><h2 class="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight mt-2 mb-3 sm:mb-4" data-i18n="Visualización interiores" data-i18n-en="Interior Visualization">Visualización interiores</h2>
+        <div class="grid grid-cols-2 gap-2 sm:gap-3">
+          <div class="aspect-[4/3] rounded-xl overflow-hidden"><img src="5.jpg" alt="Proyecto Visual 1" onclick="openLightbox(this.src)" class="modal-gallery-img w-full h-full object-cover cursor-pointer"></div>
+          <div class="aspect-[4/3] rounded-xl overflow-hidden"><img src="6.jpg" alt="Proyecto Visual 2" onclick="openLightbox(this.src)" class="modal-gallery-img w-full h-full object-cover cursor-pointer"></div>
+          <div class="aspect-[4/3] rounded-xl overflow-hidden"><img src="7.jpg" alt="Proyecto Visual 3" onclick="openLightbox(this.src)" class="modal-gallery-img w-full h-full object-cover cursor-pointer"></div>
+          <div class="aspect-[4/3] rounded-xl overflow-hidden"><img src="9.jpg" alt="Proyecto Visual 4" onclick="openLightbox(this.src)" class="modal-gallery-img w-full h-full object-cover cursor-pointer"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== LIGHTBOX ==================== -->
+  <div id="lightbox" class="lightbox inactive fixed inset-0 z-[200] bg-black/90 flex items-center justify-center" onclick="closeLightbox()">
+    <button onclick="event.stopPropagation();closeLightbox()" class="absolute top-4 right-4 sm:top-6 sm:right-6 w-10 h-10 sm:w-12 sm:h-12 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors duration-200 z-10">
+      <iconify-icon icon="lucide:x" width="20" height="20"></iconify-icon>
+    </button>
+    <img id="lightboxImg" src="" alt="" class="max-w-[92vw] max-h-[88vh] object-contain rounded-lg shadow-2xl" onclick="event.stopPropagation()">
+  </div>
+
+</div>
+
+<!-- ==================== JAVASCRIPT ==================== -->
+<script>
+(function() {
+  'use strict';
+
+  // === Hero Carousel ===
+  const totalSlides = 4;
+  let currentSlide = 0;
+
+  setInterval(function() {
+    var prev = document.getElementById('heroSlide' + currentSlide);
+    currentSlide = (currentSlide + 1) % totalSlides;
+    var next = document.getElementById('heroSlide' + currentSlide);
+    if (prev) prev.style.opacity = '0';
+    if (next) next.style.opacity = '1';
+  }, 8000);
+
+  // === Mobile Menu ===
+  var menuOpen = false;
+  var menuToggle = document.getElementById('menuToggle');
+  var mobileMenu = document.getElementById('mobileMenu');
+  var menuIcon = menuToggle.querySelector('iconify-icon');
+
+  menuToggle.addEventListener('click', function() {
+    menuOpen = !menuOpen;
+    if (menuOpen) {
+      mobileMenu.classList.add('open');
+      menuIcon.setAttribute('icon', 'lucide:x');
+    } else {
+      mobileMenu.classList.remove('open');
+      menuIcon.setAttribute('icon', 'lucide:menu');
+    }
+  });
+
+  document.querySelectorAll('.mobile-nav-link').forEach(function(link) {
+    link.addEventListener('click', function() {
+      menuOpen = false;
+      mobileMenu.classList.remove('open');
+      menuIcon.setAttribute('icon', 'lucide:menu');
+    });
+  });
+
+  // Close mobile menu on scroll
+  var scrollTimeout;
+  window.addEventListener('scroll', function() {
+    if (menuOpen) {
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(function() {
+        menuOpen = false;
+        mobileMenu.classList.remove('open');
+        menuIcon.setAttribute('icon', 'lucide:menu');
+      }, 300);
+    }
+  });
+
+  // === Navbar Shadow ===
+  var navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', function() {
+    if (window.scrollY > 10) {
+      navbar.classList.add('shadow-sm');
+    } else {
+      navbar.classList.remove('shadow-sm');
+    }
+  });
+
+  // === Scroll Reveal ===
+  var revealObserver = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('active');
+      }
+    });
+  }, { threshold: 0.05, rootMargin: '0px 0px -30px 0px' });
+
+  document.querySelectorAll('.reveal').forEach(function(el) {
+    revealObserver.observe(el);
+  });
+
+  // === Modals ===
+  window.openModal = function(id) {
+    var modal = document.getElementById(id);
+    if (modal) {
+      modal.classList.add('open');
+      document.body.classList.add('modal-open');
+      var scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+      document.body.style.paddingRight = scrollbarWidth + 'px';
+    }
+  };
+
+  window.closeModal = function() {
+    document.querySelectorAll('.modal-overlay.open').forEach(function(modal) {
+      modal.classList.remove('open');
+    });
+    document.body.classList.remove('modal-open');
+    document.body.style.paddingRight = '0px';
+  };
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      closeModal();
+      closeLightbox();
+    }
+  });
+
+  // === Lightbox ===
+  window.openLightbox = function(src) {
+    var lightbox = document.getElementById('lightbox');
+    var lightboxImg = document.getElementById('lightboxImg');
+    lightboxImg.src = src;
+    lightbox.classList.remove('inactive');
+    lightbox.classList.add('active');
+    document.body.classList.add('modal-open');
+  };
+
+  window.closeLightbox = function() {
+    var lightbox = document.getElementById('lightbox');
+    lightbox.classList.remove('active');
+    lightbox.classList.add('inactive');
+    // Only remove modal-open if no modal is also open
+    if (!document.querySelector('.modal-overlay.open')) {
+      document.body.classList.remove('modal-open');
+    }
+  };
+
+  // === Contact Form (Formspree) ===
+  var contactForm = document.getElementById('contactForm');
+  var formFields = document.getElementById('formFields');
+  var formSuccess = document.getElementById('formSuccess');
+  var formErrorMsg = document.getElementById('formErrorMsg');
+
+  contactForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+    var data = new FormData(contactForm);
+    fetch(contactForm.action, {
+      method: 'POST',
+      body: data,
+      headers: { Accept: 'application/json' },
+    })
+    .then(function(res) {
+      if (res.ok) {
+        formFields.classList.add('hidden');
+        formSuccess.classList.remove('hidden');
+        formErrorMsg.classList.add('hidden');
+        contactForm.reset();
+      } else {
+        formErrorMsg.classList.remove('hidden');
+      }
+    })
+    .catch(function() {
+      formErrorMsg.classList.remove('hidden');
+    });
+  });
+
+})();
+
+// ==================== i18n LANGUAGE TOGGLE ====================
+(function() {
+  var currentLang = localStorage.getItem('lang') || 'es';
+
+  function applyLang(lang) {
+    currentLang = lang;
+    localStorage.setItem('lang', lang);
+    document.documentElement.lang = lang;
+
+    // Update meta description
+    var metaDesc = document.querySelector('meta[name="description"]');
+    if (metaDesc) {
+      if (lang === 'en' && metaDesc.getAttribute('data-desc-en')) {
+        metaDesc.setAttribute('content', metaDesc.getAttribute('data-desc-en'));
+      } else {
+        metaDesc.setAttribute('content', 'Diseño y desarrollo de experiencias digitales únicas.');
+      }
+    }
+
+    // Update all text elements with data-i18n / data-i18n-en
+    document.querySelectorAll('[data-i18n][data-i18n-en]').forEach(function(el) {
+      var text = lang === 'en' ? el.getAttribute('data-i18n-en') : el.getAttribute('data-i18n');
+      el.textContent = text;
+    });
+
+    // Update input placeholders
+    document.querySelectorAll('[data-ph-en]').forEach(function(el) {
+      if (lang === 'en') {
+        if (el.getAttribute('data-ph-es')) el.placeholder = el.getAttribute('data-ph-es');
+        el.placeholder = el.getAttribute('data-ph-en');
+      } else {
+        if (el.getAttribute('data-ph-es')) el.placeholder = el.getAttribute('data-ph-es');
+      }
+    });
+
+    // Update toggle labels
+    var label = lang === 'en' ? 'ES' : 'EN';
+    var langLabel = document.getElementById('langLabel');
+    var langLabelMobile = document.getElementById('langLabelMobile');
+    if (langLabel) langLabel.textContent = label;
+    if (langLabelMobile) langLabelMobile.textContent = label;
+  }
+
+  window.toggleLang = function() {
+    applyLang(currentLang === 'es' ? 'en' : 'es');
+  };
+
+  // Store original placeholders on load
+  document.querySelectorAll('[data-ph-en]').forEach(function(el) {
+    el.setAttribute('data-ph-es', el.placeholder);
+  });
+
+  // Apply saved language
+  applyLang(currentLang);
+})();
+</script>
+
+
+</body></html>
